@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/cupertino.dart';
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Poppins'
       ),
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
@@ -40,10 +42,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedValue = 'Jan';
+  List<Map<String, dynamic>> myData = [];
+
+
+  Future<void> fetchExpenseData() async {
+    List<Map<String, dynamic>> data = await expenseList();
+    //var d = totalAmount = (await totalDayAmount('2023-12-17')) as Double;
+    setState(() {
+      myData = data;
+
+    });
+  }
 
   @override
   void initState(){
     super.initState();
+    fetchExpenseData();
   }
   @override
   Widget build(BuildContext context) {
@@ -72,9 +86,9 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 CupertinoSegmentedControl<int>(
-                  children: {
-                    0: const Text('Expenses'),
-                    1: const Text('Income'),
+                  children: const {
+                    0: Text('Expenses'),
+                    1: Text('Income'),
                   },
                   onValueChanged: (int value) {
                     // setState(() {
@@ -101,7 +115,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             ExpenseBarChart(),
-            const Card(
+             const Card(
               child: Column(
                 children: [
                   ListTile(
@@ -110,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                           fontWeight: FontWeight.bold,
                           fontSize: 15
                       ),),
-                    trailing: Text('Ksh. 500',
+                    trailing: Text('',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16
@@ -119,38 +133,33 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            const Expanded(
-                child:Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.local_pizza),
-                      title: Text('Pizza'),
-                      trailing: Text('Ksh. 200'),
-                      subtitle: Text('cash'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.local_pizza),
-                      title: Text('Pizza'),
-                      trailing: Text('Ksh. 200'),
-                      subtitle: Text('cash'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.local_pizza),
-                      title: Text('Pizza'),
-                      trailing: Text('Ksh. 200'),
-                      subtitle: Text('cash'),
-                    ),
-
-                  ],
-                )
+             Expanded(
+                child: ListView.builder(
+                    itemCount: myData.length,
+                    itemBuilder: (context, index){
+                      return ListTile(
+                        leading: Image.asset('assets/images/spending.png'),
+                        title: Text('${myData[index]['category']}',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold
+                          ),
+                          ),
+                        trailing: Text(
+                            'Ksh. ${myData[index]['expense_name']}',
+                          style: const TextStyle(
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16
+                          ),
+                        ),
+                        onTap: (){
+                          print('${myData[index]['expense_name']}');
+                        },
+                      );
+                    }
+                ),
             ),
-            ElevatedButton(
-                onPressed:(){
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const addExpensesPage(),));
-                },
-                child: const Text('data')
-            )
           ],
         ),
       ),

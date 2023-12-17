@@ -64,6 +64,9 @@ class Category{
          conflictAlgorithm: ConflictAlgorithm.replace
      );
    }
+
+   //************************* LIST ALL CATEGORY *******************************
+
    Future<List<Map<String, dynamic>>> categoryList() async {
         final db = await initDatabase();
         final List<Map<String, dynamic>> maps = await db.query('category');
@@ -75,4 +78,21 @@ class Category{
         // });
         return db.query('category');
    }
+   //*************************** LIST EXPENSES *********************************
 
+  Future<List<Map<String, dynamic>>> expenseList() async{
+  final db = await initDatabase();
+  final List<Map<String, dynamic>> maps = await db.query('expense');
+  return db.query('expense');
+  }
+
+  // *************************** Total Daily Expenditure Amount ****************
+
+  Future<double> totalDayAmount(String date) async {
+    final db = await initDatabase();
+    final List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT SUM(expense_name) AS total_amount FROM expense WHERE expense_date = ?',[date],
+    );
+    double totalAmount = (result.first['total_amount'] ?? 0)as double;
+    return totalAmount;
+  }

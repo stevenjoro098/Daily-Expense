@@ -55,6 +55,11 @@ class _addExpensesPageState extends State<addExpensesPage> {
       ..showSnackBar(SnackBar(content: Text('${ result } Selected')));
   }
 
+  void clear_textfields (){
+    expenseCategory = "";
+    expenseDescription.text = "";
+    expensesController.text = "";
+  }
 
 @override
   void initState(){
@@ -66,21 +71,19 @@ class _addExpensesPageState extends State<addExpensesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.teal,
+        title: const Text('Expense Form',
+          style: const TextStyle(
+              fontWeight: FontWeight.bold
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: Center(
         child: Column(
           children: [
             const SizedBox(height: 20,),
-            Row(
-              children: [
-                IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-                const Text('Add Expenses'),
-              ],
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -112,8 +115,10 @@ class _addExpensesPageState extends State<addExpensesPage> {
                   child: TextField(
                     controller: expensesController,
                     decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.money_outlined),
                       hintText: 'Enter Amount',
                       labelText: 'Expense Amount',
+                      filled: true,
                       border: OutlineInputBorder()
                     ),
                   )
@@ -125,22 +130,51 @@ class _addExpensesPageState extends State<addExpensesPage> {
                  child: TextField(
                    controller: expenseDescription,
                    decoration: const InputDecoration(
-                     hintText: 'Description'
+                     prefixIcon: Icon(Icons.comment),
+                     hintText: 'Description',
+                     filled: true
                    ),
                  ),
                ),
              ),
-             ElevatedButton(
-                  onPressed: (){
-                    insertExpense(
-                        expensesController.text,
-                        expenseDescription.text,
-                        "${now.year}-${now.month}-${now.day}",
-                        expenseCategory,
-                    );
-                  },
-                  child: const Text('Submit'),
-              ),
+             const SizedBox(height: 20,),
+             Row(
+               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+               children: [
+                 ElevatedButton(
+                      onPressed: (){
+                        insertExpense(
+                            expensesController.text,
+                            expenseDescription.text,
+                            "${now.year}-${now.month}-${now.day}",
+                            expenseCategory,
+                        );
+                        clear_textfields();
+                        final snackBar = SnackBar(
+                          content: const Text('Expense Added Successfully'),
+                          action: SnackBarAction(
+                            label: 'Undo',
+                            onPressed: () {
+                              // Some code to undo the change.
+                            },
+                          ),
+                        );
+
+                        // Find the ScaffoldMessenger in the widget tree
+                        // and use it to show a SnackBar.
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      },
+                      child: const Text('Submit'),
+                  ),
+                ElevatedButton(
+                      onPressed: (){
+                        clear_textfields();
+                      },
+                      child: Text('Cancel')
+                    ),
+               ],
+             ),
+            SizedBox(height: 15,),
             TextButton(
                 onPressed:(){
                   showDialog(
