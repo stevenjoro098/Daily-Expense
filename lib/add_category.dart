@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'db.dart';
-import 'dart:async';
-
-import 'package:flutter/widgets.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
+import 'dart:async';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'db.dart';
+import 'add_expenditure.dart';
+
 
 class addCategoryDialog extends StatefulWidget {
   const addCategoryDialog({super.key});
@@ -14,8 +16,17 @@ class addCategoryDialog extends StatefulWidget {
 }
 
 class _addCategoryDialogState extends State<addCategoryDialog> {
-  final DatabaseHelper _databaseHelper = DatabaseHelper();
+
   final TextEditingController _categoryController = TextEditingController();
+
+  
+  @override
+  void initState(){
+    super.initState();
+
+
+    //this._databaseHelper.initDatabase();
+  }
   @override
   Widget build(BuildContext context) {
     return  AlertDialog(
@@ -28,8 +39,11 @@ class _addCategoryDialogState extends State<addCategoryDialog> {
         ElevatedButton(
             onPressed: () async {
               String data = _categoryController.text;
+              setState(() {
+
+              });
               // Save data to SQLite
-              await _databaseHelper.insertCategory(data);
+              await insertCategory(data);
               Navigator.of(context).pop();
             },
             child: Text('ADD')
@@ -44,4 +58,30 @@ class _addCategoryDialogState extends State<addCategoryDialog> {
       ],
     );
   }
+  // Future<Database> _getDatabase() async {
+  //   Directory directory = await getApplicationDocumentsDirectory();
+  //   String path = join(directory.path, 'expenses.db');
+  //   print('Get database method called: $path');
+  //   return openDatabase(
+  //       path,
+  //       version: 1,
+  //       onCreate: (Database db, int version) async {
+  //         await db.execute('''
+  //         CREATE TABLE category(
+  //           id INTEGER PRIMARY KEY,
+  //           content TEXT
+  //         )
+  //       ''');
+  //       });
+  // }
+  //
+  // Future<void> insertData(String data) async {
+  //   final Database db = await _getDatabase();
+  //   print('iNsert data method called');
+  //   await db.insert(
+  //     'category',
+  //     {'content': data},
+  //     conflictAlgorithm: ConflictAlgorithm.replace,
+  //   );
+  // }
 }

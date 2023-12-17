@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/cupertino.dart';
 import 'add_expenditure.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite/sqflite.dart';
+import 'db.dart';
 
-void main() {
+void main()  async {
+  sqfliteFfiInit(); // Initialize sqflite_common_ffi
+  databaseFactory = databaseFactoryFfi;
   runApp(MyApp());
 }
 
@@ -36,6 +41,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String selectedValue = 'Jan';
 
+  @override
+  void initState(){
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
