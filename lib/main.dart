@@ -43,21 +43,37 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String selectedValue = 'Jan';
   List<Map<String, dynamic>> myData = [];
+  double dailyTotal = 0.0;
+  DateTime now = DateTime.now();
+
+  DateTime getTodaysDate() {
+    DateTime now = DateTime.now();
+    return DateTime(now.year, now.month, now.day);
+  }
 
 
   Future<void> fetchExpenseData() async {
-    List<Map<String, dynamic>> data = await expenseList();
+    List<Map<String, dynamic>> data = await expenseList('${now.year}-${now.month}-${now.day}');
     //var d = totalAmount = (await totalDayAmount('2023-12-17')) as Double;
     setState(() {
       myData = data;
-
     });
+  }
+
+
+  void getTodayTotal(){
+      totalDayAmount('${now.year}-${now.month}-${now.day}').then((value){
+        setState(() {
+          dailyTotal = value as double;
+        });
+      });
   }
 
   @override
   void initState(){
     super.initState();
     fetchExpenseData();
+    getTodayTotal();
   }
   @override
   Widget build(BuildContext context) {
@@ -115,17 +131,17 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             ExpenseBarChart(),
-             const Card(
+              Card(
               child: Column(
                 children: [
                   ListTile(
-                    leading: Text('Todays Expenditure:',
+                    leading: const Text('Todays Expenditure:',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 15
                       ),),
-                    trailing: Text('',
-                      style: TextStyle(
+                    trailing: Text('Ksh. ${dailyTotal}',
+                      style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16
                       ),),
@@ -146,7 +162,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                           ),
                         trailing: Text(
-                            'Ksh. ${myData[index]['expense_name']}',
+                            'Ksh. ${myData[index]['expense_amount']}',
                           style: const TextStyle(
                             color: Colors.blueAccent,
                             fontWeight: FontWeight.bold,
@@ -154,7 +170,34 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         onTap: (){
-                          print('${myData[index]['expense_name']}');
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context){
+                                 return AlertDialog(
+                                   title: Text('${myData[index]['category']}.',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.teal
+                                                ),),
+                                   content: Container(
+                                     child: Column(
+                                       mainAxisSize: MainAxisSize.min,
+                                       children: [
+                                         Text('Amount. Ksh ${myData[index]['expense_amount']}',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.blue,
+                                            fontSize: 15
+                                          ),),
+                                         Text('${myData[index]['expense_date']}'),
+                                         Text('${myData[index]['description']}'),
+
+                                       ],
+                                     ),
+                                   ),
+                                 );
+                              }
+                          );
                         },
                       );
                     }
@@ -167,7 +210,6 @@ class _HomePageState extends State<HomePage> {
         onPressed: (){
           Navigator.push(context,
             MaterialPageRoute(builder: (context) => const addExpensesPage()),);
-          print('key pressed');
         },
         backgroundColor: Colors.pink,
         child: const Icon(Icons.add),
@@ -193,7 +235,7 @@ class _ExpenseBarChartState extends State<ExpenseBarChart> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 200, // Adjust height as needed
+      height: 180, // Adjust height as needed
       child: charts.BarChart(
         seriesList,
         animate: true,
@@ -224,7 +266,7 @@ class _ExpenseBarChartState extends State<ExpenseBarChart> {
         colorFn: (_, index) => charts.ColorUtil.fromDartColor(
           _getColor(index!),
         ),
-        labelAccessorFn: (Expense expense, _) => '\$${expense.amount.toString()}',
+        labelAccessorFn: (Expense expense, _) => 'Ksh.${expense.amount.toString()}',
       ),
     ];
   }

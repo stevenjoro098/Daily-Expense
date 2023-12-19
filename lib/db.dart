@@ -47,7 +47,7 @@ class Category{
             CREATE TABLE expense(
                   id INTEGER PRIMARY KEY,
                   category TEXT, 
-                  expense_name TEXT, 
+                  expense_amount INTEGER, 
                   description TEXT, 
                   expense_date DATE )
               ''');
@@ -78,21 +78,33 @@ class Category{
         // });
         return db.query('category');
    }
-   //*************************** LIST EXPENSES *********************************
+   //*************************** LIST DATE EXPENSES *********************************
 
-  Future<List<Map<String, dynamic>>> expenseList() async{
+  Future<List<Map<String, dynamic>>> expenseList(String date) async{
   final db = await initDatabase();
-  final List<Map<String, dynamic>> maps = await db.query('expense');
-  return db.query('expense');
+  final List<Map<String, dynamic>> result = await db.rawQuery('''
+        SELECT *
+        FROM expense
+        WHERE DATE(expense_date) = '${date}';
+
+  ''');
+  return result;
   }
 
   // *************************** Total Daily Expenditure Amount ****************
 
   Future<double> totalDayAmount(String date) async {
     final db = await initDatabase();
+    print('Date: $date');
     final List<Map<String, dynamic>> result = await db.rawQuery(
-      'SELECT SUM(expense_name) AS total_amount FROM expense WHERE expense_date = ?',[date],
+      '''
+        SELECT SUM(expense_amount) AS total_amount 
+        FROM expense 
+        WHERE expense_date='${date}'
+      ''',
     );
-    double totalAmount = (result.first['total_amount'] ?? 0)as double;
+    double totalAmount = (result.first['total_amount'] ?? 0) as double;
+    print(result);
     return totalAmount;
   }
+  // ********************* Filter Expenses By Date *****************************

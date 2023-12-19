@@ -24,7 +24,7 @@ class _addExpensesPageState extends State<addExpensesPage> {
     print('Expense insert Method Called');
     await db.insert(
       'expense',
-      {'expense_name': expense,
+      {'expense_amount': expense,
         'description': description,
         'expense_date': expense_date,
         'category': category
@@ -45,7 +45,7 @@ class _addExpensesPageState extends State<addExpensesPage> {
     setState(() {
       expenseCategory = result;
     });
-    print('$expenseCategory after setstate');
+    //print('$expenseCategory after setstate');
     if (!mounted) return;
     //print(result);
     // After the Selection Screen returns a result, hide any previous snackbars
@@ -97,8 +97,13 @@ class _addExpensesPageState extends State<addExpensesPage> {
                 ),
                 ElevatedButton.icon(
                     onPressed: (){
-                      _navigateAndDisplaySelection(context); // push the alertwidget and receive data from it.
-                    },
+                      _navigateAndDisplaySelection(context); // push the alert widget and receive data from it.
+                      // showDialog(
+                      //   context: context,
+                      //   builder: (BuildContext context) {
+                      //     return listCategory();
+                      //   });
+                      },
                     label: const Text('Category'),
                     icon: const Icon(Icons.category),
                     style: ButtonStyle(
