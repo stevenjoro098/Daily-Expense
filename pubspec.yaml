@@ -87,6 +87,8 @@ flutter:
   assets:
     - assets/images/spending.png
     - assets/images/empty_list.gif
+    - assets/images/cost.png
+    - assets/images/rascal-nothing-to-see-here.gif
   fonts:
      - family: Poppins
        fonts:

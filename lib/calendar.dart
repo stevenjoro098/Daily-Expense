@@ -16,15 +16,18 @@ class _CalendarPageState extends State<CalendarPage> {
   List<Map<String, dynamic>> dayExpenses = [];
   DateTime now = DateTime.now();
 
-  Future<void> getDateExpenses(date) async{
+  Future<List<Map<String, dynamic>>> getDateExpenses(date) async{
     List<Map<String, dynamic>> data = await expenseList(date);
-    print('$date - $data');
-
+    //print('$date - $data');
+    setState(() {
+      dayExpenses = data; // constantly update list when data is fetched.
+    });
+    print(dayExpenses);
+    return data;
   }
 
   String extractDate(String dateTimeString){
       DateTime dateTime = DateTime.parse(dateTimeString);
-
       String dateOnly = "${dateTime.year}-${dateTime.month}-${dateTime.day}";
       print("Extracted Date: $dateOnly");
       return dateOnly;
@@ -39,34 +42,58 @@ class _CalendarPageState extends State<CalendarPage> {
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          TableCalendar(
-            firstDay: DateTime.utc(2023, 1, 1),
-            lastDay: DateTime.utc(2023, 12, 31),
-            focusedDay: _focusedDay,
-            calendarFormat: _calendarFormat,
-            selectedDayPredicate: (day){
-              return isSameDay(_selectedDay, day);
-            },
-            onDaySelected: (selectedDay, focusedDay){
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-              print(selectedDay);
-              String date = extractDate("$selectedDay");
-              getDateExpenses(date);
-            },
-            onFormatChanged: (format){
-              setState(() {
-                _calendarFormat = format;
-              });
-          },
-            onPageChanged: (focusedDay){
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TableCalendar(
+              firstDay: DateTime.utc(2023, 1, 1),
+              lastDay: DateTime.utc(2023, 12, 31),
+              focusedDay: _focusedDay,
+              calendarFormat: _calendarFormat,
+              selectedDayPredicate: (day){
+                return isSameDay(_selectedDay, day);
+              },
+              onDaySelected: (selectedDay, focusedDay){
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+               // print(selectedDay);
+               String date = extractDate("$selectedDay");
 
+               getDateExpenses(date);
+
+              },
+              onFormatChanged: (format){
+                setState(() {
+                  _calendarFormat = format;
+                });
             },
+              onPageChanged: (focusedDay){
+
+              },
+            ),
           ),
           const Divider(),
+          const Text('Expenses: ', style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),),
+          Expanded(
+            child: dayExpenses.isEmpty ?
+                Center(
+                  child: Image.asset('assets/images/rascal-nothing-to-see-here.gif', height: 300, width: 300,),
 
+                )
+            :ListView.builder(
+                itemCount: dayExpenses.length,
+                itemBuilder: (context, index){
+                  return ListTile(
+                    leading: Image.asset('assets/images/cost.png'),
+                    title: Text('${dayExpenses[index]['category']}'),
+                    trailing: Text('Ksh. ${dayExpenses[index]['expense_amount']}'),
+                  );
+                }
+            ),
+          )
 
         ],
       ),
