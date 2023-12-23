@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:async';
@@ -47,7 +48,7 @@ class Category{
             CREATE TABLE expense(
                   id INTEGER PRIMARY KEY,
                   category TEXT, 
-                  expense_amount INTEGER, 
+                  expense_amount DOUBLE, 
                   description TEXT, 
                   expense_date DATE )
               ''');
@@ -103,8 +104,52 @@ class Category{
         WHERE expense_date='${date}'
       ''',
     );
-    double totalAmount = (result.first['total_amount'] ?? 0) as double;
-    print(result);
+    double totalAmount = (result.first['total_amount'] ?? 0.0) as double;
+    print('Todays total: $totalAmount');
     return totalAmount;
   }
-  // ********************* Filter Expenses By Date *****************************
+  // ********************* Total Month Expense Amount *****************************
+
+  Future<double> totalMonthlyExpenditure(int month) async{
+      final db = await initDatabase();
+      final List<Map<String, dynamic>> result = await db.rawQuery(
+        '''
+        SELECT strftime('%m',expense_date) AS month_number,
+            SUM(expense_amount) AS total_amount
+        FROM expense
+        WHERE strftime('%m',expense_date) = '12'  -- Replace '12' with your desired month number
+        GROUP BY strftime('%m', expense_date);
+        ''');
+      print(result.first['total_amount']);
+      double totalAmount = (result.first['total_amount'] ?? 0 ) as double;
+      return totalAmount;
+  }
+  // ************************ Category and Its total Sum ************************
+
+Future<List> categorySum() async {
+  final db = await initDatabase();
+  final List<Map<String, dynamic>> result = await db.rawQuery('''
+    SELECT category, SUM(expense_amount) AS total_amount
+    FROM expense
+    GROUP BY category;
+  ''');
+
+  // Create a set of all unique categories from the result
+  Set<String> allCategories = Set.from(result.map((item) => item['category'] as String));
+
+  // Create a map with default values of zero for all categories
+  Map<String, dynamic> categoryMap = {};
+  allCategories.forEach((category) {
+    categoryMap[category] = {'category': category, 'total_amount': 0};
+  });
+
+  // Update the map with values from the result
+  result.forEach((item) {
+    final category = item['category'] as String;
+    categoryMap[category] = item;
+  });
+
+  // Return the values as a list
+  return categoryMap.values.toList();
+}
+

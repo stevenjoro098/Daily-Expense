@@ -7,6 +7,7 @@ import 'add_expenditure.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 import 'db.dart';
+import 'calendar.dart';
 
 void main()  async {
   sqfliteFfiInit(); // Initialize sqflite_common_ffi
@@ -42,8 +43,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedValue = 'Jan';
+
   List<Map<String, dynamic>> myData = [];
   double dailyTotal = 0.0;
+  double monthlyTotal = 0.0;
   DateTime now = DateTime.now();
 
   DateTime getTodaysDate() {
@@ -69,32 +72,54 @@ class _HomePageState extends State<HomePage> {
       });
   }
 
+  void getMonthlyTotal(){
+    totalMonthlyExpenditure(12).then((value){
+      setState(() {
+        monthlyTotal = value;
+      });
+    });
+  }
+
   @override
   void initState(){
     super.initState();
     fetchExpenseData();
     getTodayTotal();
+    getMonthlyTotal();
+    categorySum();
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
             Container(
               padding: const EdgeInsets.all(12),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.menu),
-                  Text('Ksh. 3000.00',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22
-                    ),
+                  const Icon(Icons.menu),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('This Month Expenditure',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold
+
+                      ),),
+                      Text('KSh. $monthlyTotal',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 22
+                        ),
+                      ),
+                    ],
                   ),
-                  Icon(Icons.notifications)
+                  const Icon(Icons.notifications)
                 ],
               ),
             ),
@@ -107,9 +132,10 @@ class _HomePageState extends State<HomePage> {
                     1: Text('Income'),
                   },
                   onValueChanged: (int value) {
-                    // setState(() {
-                    //   segmentedValue = value;
-                    // });
+                    setState(() {
+                      Navigator.push(context,
+                         MaterialPageRoute(builder: (context) => const CalendarPage()),);
+                    });
                   },
                   //groupValue: segmentedValue,
                 ),
@@ -130,28 +156,38 @@ class _HomePageState extends State<HomePage> {
                 )
               ],
             ),
-            ExpenseBarChart(),
+            SizedBox(height: 5,),
+            Center(child: ExpenseBarChart()),
               Card(
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: const Text('Todays Expenditure:',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15
-                      ),),
-                    trailing: Text('Ksh. ${dailyTotal}',
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16
-                      ),),
-                  )
-                ],
+              child: ListTile(
+                leading: const Text('Todays Expenditure:',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15
+                  ),),
+                trailing: Text('Ksh. ${dailyTotal}',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16
+                  ),),
               ),
-            ),
+                          ),
+
              Expanded(
-                child: ListView.builder(
+                child: myData.isEmpty ?
+                Container(
+                  child: Center(
+                    // Show GIF when the list is empty
+                    child: Image.asset(
+                      'assets/images/empty_list.gif',
+                      width: 300, // Adjust width as needed
+                      height: 300, // Adjust height as needed
+                    ),
+                  ),
+                )
+                :ListView.builder(
                     itemCount: myData.length,
+                    shrinkWrap: true,
                     itemBuilder: (context, index){
                       return ListTile(
                         leading: Image.asset('assets/images/spending.png'),
@@ -183,15 +219,12 @@ class _HomePageState extends State<HomePage> {
                                      child: Column(
                                        mainAxisSize: MainAxisSize.min,
                                        children: [
-                                         Text('Amount. Ksh ${myData[index]['expense_amount']}',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.blue,
-                                            fontSize: 15
-                                          ),),
-                                         Text('${myData[index]['expense_date']}'),
-                                         Text('${myData[index]['description']}'),
-
+                                         ListTile(
+                                           leading: Icon(Icons.description),
+                                           title: Text(myData[index]['description']),
+                                           subtitle:Text('${myData[index]['expense_date']}'),
+                                           trailing: Text('Ksh. ${myData[index]['expense_amount']}'),
+                                         )
                                        ],
                                      ),
                                    ),
@@ -224,61 +257,65 @@ class ExpenseBarChart extends StatefulWidget {
 }
 
 class _ExpenseBarChartState extends State<ExpenseBarChart> {
-  late List<charts.Series<Expense, String>> seriesList;
+  late List<charts.Series<dynamic, String>> _seriesList=[];
 
   @override
   void initState() {
     super.initState();
-    seriesList = _createSampleData();
+    fetchDataAndSetState();
   }
 
+  List<charts.Color> colorsList = [
+    charts.MaterialPalette.blue.shadeDefault,
+    charts.MaterialPalette.red.shadeDefault,
+    charts.MaterialPalette.green.shadeDefault,
+    charts.MaterialPalette.pink.shadeDefault,
+    charts.MaterialPalette.yellow.shadeDefault
+  ];
+  Future<void> fetchDataAndSetState() async {
+    List data = await categorySum();
+    List<charts.Series<dynamic, String>> series = [
+      charts.Series(
+        id: 'Category Total',
+        data: data,
+        domainFn: (dynamic datum, _) => datum['category'] as String,
+        measureFn: (dynamic datum, _) => datum['total_amount'] as num,
+        colorFn: (dynamic datum, _){
+          int categoryIndex = data.indexWhere((element) => element['category'] == datum['category']);
+          return colorsList[categoryIndex % colorsList.length];
+        },
+        labelAccessorFn: (dynamic datum, _) => '${datum['total_amount']}',
+      ),
+    ];
+    setState(() {
+      _seriesList = series;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 180, // Adjust height as needed
+      height: 200, // Adjust height as needed
       child: charts.BarChart(
-        seriesList,
+        _seriesList,
         animate: true,
-        //vertical: false,
+        vertical: true,
         barRendererDecorator: charts.BarLabelDecorator<String>(),
-        domainAxis: const charts.OrdinalAxisSpec(
-          renderSpec: charts.NoneRenderSpec(),
-        ),
-      ),
-    );
+        // domainAxis: const charts.OrdinalAxisSpec(
+        //   renderSpec: charts.NoneRenderSpec(),
+        // ),
+       ),
+      );
+    }
   }
 
-  List<charts.Series<Expense, String>> _createSampleData() {
-    final data = [
-      Expense('Food', 500),
-      Expense('Transportation', 300),
-      Expense('Utilities', 450),
-      Expense('Entertainment', 200),
-      // Add more items with their respective expenditures
-    ];
+  // Color _getColor(int index) {
+  //   List<Color> colors = [
+  //     Colors.blue,
+  //     Colors.green,
+  //     Colors.orange,
+  //     Colors.red,
+  //     // Add more colors if needed
+  //   ];
+  //   return colors[index % colors.length];
+  // }
 
-    return [
-      charts.Series<Expense, String>(
-        id: 'Expenses',
-        domainFn: (Expense expense, _) => expense.item,
-        measureFn: (Expense expense, _) => expense.amount,
-        data: data,
-        colorFn: (_, index) => charts.ColorUtil.fromDartColor(
-          _getColor(index!),
-        ),
-        labelAccessorFn: (Expense expense, _) => 'Ksh.${expense.amount.toString()}',
-      ),
-    ];
-  }
-
-  Color _getColor(int index) {
-    List<Color> colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.red,
-      // Add more colors if needed
-    ];
-    return colors[index % colors.length];
-  }
-}

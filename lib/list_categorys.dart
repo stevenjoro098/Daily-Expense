@@ -84,7 +84,7 @@ class _listCategoryState extends State<listCategory> {
           Divider(),
           ElevatedButton(
               onPressed: (){
-                Navigator.of(context).pop(null);
+                Navigator.of(context).pop();
               },
               child: Text('Cancel',
               style: TextStyle(
