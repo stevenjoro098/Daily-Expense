@@ -1,16 +1,11 @@
-# daily_expenses
+# Daily Expenses Tracker App
 
-A new Flutter project.
+## Overview
+This Flutter application helps users monitor their daily expenses effortlessly. It provides a simple and intuitive interface for tracking expenditures, categorizing expenses, and generating reports to gain insights into spending patterns.
 
-## Getting Started
+## Features
+- **Expense Logging**: Users can record their daily expenses with details such as amount, category, and notes.
+- **Expense Categories**: Expenses can be categorized into predefined categories (e.g., groceries, utilities, entertainment).
+- **Expense Analytics**: The app generates visual reports and charts to help users understand their spending habits.
+- **Budget Setting**: Users can set daily, weekly, or monthly budgets to manage their expenses effectively.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
