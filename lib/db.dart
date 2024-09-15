@@ -127,10 +127,7 @@ Future<List<Map<String, dynamic>>> AllExpenseList() async {
 
 Future<double> totalMonthlyExpenditure(int month, int year) async {
   final db = await initDatabase();
-  print("${ month}-${year}");
-  // Format the month as two digits
-  String formattedMonth = month.toString().padLeft(2, '0');
-
+  //print("${ month}-${year}");
   // Execute the query using db.query() method
   final List<Map<String, dynamic>> result = await db.query(
     'expense', // The table name
@@ -148,12 +145,14 @@ Future<double> totalMonthlyExpenditure(int month, int year) async {
 
 // ************************ Category and Its total Sum ************************
 
-Future<List> categorySum() async {
+Future<List> categorySum(int month, int year) async {
   final db = await initDatabase();
   final List<Map<String, dynamic>> result = await db.rawQuery('''
     SELECT category, SUM(expense_amount) AS total_amount
     FROM expense
+    WHERE expense_date LIKE '${year}-${month}%'
     GROUP BY category;
+    
   ''');
 
   // Create a set of all unique categories from the result

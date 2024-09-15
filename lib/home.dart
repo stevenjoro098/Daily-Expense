@@ -5,6 +5,7 @@ import 'ExpenseChartBar.dart';
 import 'db.dart';
 import 'calendar.dart';
 import 'add_expenditure.dart';
+import '_helperFn.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedValue = '';
+  int selectedMonth = 0;
 
   List<Map<String, dynamic>> myData = [];
   double dailyTotal = 0.0;
@@ -49,6 +51,23 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  int _getMonthNumber(String monthName) {
+    const monthMap = {
+      'Jan': 1,
+      'Feb': 2,
+      'Mar': 3,
+      'Apr': 4,
+      'May': 5,
+      'Jun': 6,
+      'Jul': 7,
+      'Aug': 8,
+      'Sep': 9,
+      'Oct': 10,
+      'Nov': 11,
+      'Dec': 12,
+    };
+    return monthMap[monthName] ?? DateTime.now().month; // Default to current month
+  }
 
   void getTodayTotal(){
     // get sum of days expenses.
@@ -59,9 +78,9 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void getMonthlyTotal(){
+  void getMonthlyTotal(int month){
     // get total for month
-    totalMonthlyExpenditure(now.month, now.year).then((value){
+    totalMonthlyExpenditure(month, now.year).then((value){
       setState(() {
         monthlyTotal = value;
       });
@@ -74,8 +93,8 @@ class _HomePageState extends State<HomePage> {
     getCurrentMonth();
     fetchExpenseData();
     getTodayTotal();
-    getMonthlyTotal();
-    categorySum();
+    getMonthlyTotal(now.month);
+    //categorySum(now.month, now.year);
   }
   @override
   Widget build(BuildContext context) {
@@ -94,8 +113,8 @@ class _HomePageState extends State<HomePage> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('This Month Expenditure',
-                        style: const TextStyle(
+                      const Text('This Month Expenditure',
+                        style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold
 
@@ -133,7 +152,14 @@ class _HomePageState extends State<HomePage> {
                   onChanged: (newValue){
                     setState(() {
                       selectedValue = newValue!;
+                      selectedMonth = _getMonthNumber(selectedValue);
                     });
+                    //print("Month Code:${ selectedMonth}");
+                    categorySum(selectedMonth, now.year);
+                    getMonthlyTotal(selectedMonth);
+                    //ExpenseBarChart(month: selectedMonth, year:now.year);
+
+
                   },
                   items: <String>['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
                       .map<DropdownMenuItem<String>>((String value) {
@@ -151,13 +177,13 @@ class _HomePageState extends State<HomePage> {
               child: Center(
                   child:Card(
                     elevation: 3,
-                      child: ExpenseBarChart()
+                      child: ExpenseBarChart(month: now.month, year: now.year)
                   )
               ),
             ),
             Card(
               child: ListTile(
-                leading: const Text('Todays Expenditure:',
+                leading: const Text("Today's Expenditure:",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15
@@ -246,5 +272,6 @@ class _HomePageState extends State<HomePage> {
         child: const Icon(Icons.add),
       ),
     ) ;
+
   }
 }

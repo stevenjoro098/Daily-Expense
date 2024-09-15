@@ -3,6 +3,11 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'db.dart';
 
 class ExpenseBarChart extends StatefulWidget {
+  final int month; // Parameter to pass
+  final int year;    // Another parameter
+
+  const ExpenseBarChart({Key? key, required this.month, required this.year}) : super(key: key);
+
   @override
   _ExpenseBarChartState createState() => _ExpenseBarChartState();
 }
@@ -21,10 +26,12 @@ class _ExpenseBarChartState extends State<ExpenseBarChart> {
     charts.MaterialPalette.red.shadeDefault,
     charts.MaterialPalette.green.shadeDefault,
     charts.MaterialPalette.pink.shadeDefault,
-    charts.MaterialPalette.yellow.shadeDefault
+    charts.MaterialPalette.yellow.shadeDefault,
+    charts.MaterialPalette.teal.shadeDefault,
+    charts.MaterialPalette.purple.shadeDefault
   ];
   Future<void> fetchDataAndSetState() async {
-    List data = await categorySum();
+    List data = await categorySum(widget.month, widget.year);
     List<charts.Series<dynamic, String>> series = [
       charts.Series(
         id: 'Category Total',
