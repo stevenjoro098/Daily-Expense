@@ -71,12 +71,6 @@ class Category{
    Future<List<Map<String, dynamic>>> categoryList() async {
         final db = await initDatabase();
         final List<Map<String, dynamic>> maps = await db.query('category');
-        print('Fetch Category Method Called');
-        // return List.generate(maps.length, (i){
-        //   return Category(id: maps[i]['id'] as int,
-        //       category_name: maps[i]['category_name'] as String
-        //   );
-        // });
         return db.query('category');
    }
    //*************************** LIST DATE EXPENSES *********************************
@@ -86,11 +80,31 @@ class Category{
   final List<Map<String, dynamic>> result = await db.rawQuery('''
         SELECT *
         FROM expense
-        WHERE DATE(expense_date) = '${date}';
+        WHERE expense_date = '$date';
 
   ''');
   return result;
   }
+  // ***************************** List All Expenses ***************************
+
+Future<List<Map<String, dynamic>>> AllExpenseList() async {
+  final db = await initDatabase();
+  // Ensure the month is two digits
+  int formattedMonth = 9;
+  int year = 2024;
+  final List<Map<String, dynamic>> result = await db.rawQuery(
+      '''
+    SELECT *
+    FROM expense
+    WHERE expense_date LIKE '${year}-${formattedMonth}%'
+    ''',
+
+  );
+
+ // print(result);  // Debug: print the result
+  return result;
+}
+
 
   // *************************** Total Daily Expenditure Amount ****************
 
@@ -106,25 +120,33 @@ class Category{
     );
     double totalAmount = (result.first['total_amount'] ?? 0.0) as double;
     print('Todays total: $totalAmount');
+
     return totalAmount;
   }
   // ********************* Total Month Expense Amount *****************************
 
-  Future<double> totalMonthlyExpenditure(int month) async{
-      final db = await initDatabase();
-      final List<Map<String, dynamic>> result = await db.rawQuery(
-        '''
-        SELECT strftime('%m',expense_date) AS month_number,
-            SUM(expense_amount) AS total_amount
-        FROM expense
-        WHERE strftime('%m',expense_date) = '12'  -- Replace '12' with your desired month number
-        GROUP BY strftime('%m', expense_date);
-        ''');
-      print(result.first['total_amount']);
-      double totalAmount = (result.first['total_amount'] ?? 0 ) as double;
-      return totalAmount;
-  }
-  // ************************ Category and Its total Sum ************************
+Future<double> totalMonthlyExpenditure(int month, int year) async {
+  final db = await initDatabase();
+  print("${ month}-${year}");
+  // Format the month as two digits
+  String formattedMonth = month.toString().padLeft(2, '0');
+
+  // Execute the query using db.query() method
+  final List<Map<String, dynamic>> result = await db.query(
+    'expense', // The table name
+    columns: ['SUM(expense_amount) AS total_amount'], // Columns to fetch
+    where: "expense_date LIKE '${ year }-${ month }%'"
+  );
+
+  // Get the total amount or return 0 if null
+  double totalAmount = (result.first['total_amount'] ?? 0).toDouble();
+
+  print('DB Monthly total: $totalAmount');
+  AllExpenseList();
+  return totalAmount;
+}
+
+// ************************ Category and Its total Sum ************************
 
 Future<List> categorySum() async {
   final db = await initDatabase();
@@ -153,3 +175,20 @@ Future<List> categorySum() async {
   return categoryMap.values.toList();
 }
 
+// ***************************** DELETE CATEGORY ********************************
+
+Future<void> deleteCategory(int id) async {
+  final db = await initDatabase();
+  await db.rawQuery('DELETE FROM category WHERE id =?', [id]); // Replace 123 with the ID
+  //print('Deleted Object');
+}
+
+// **************************** DELETE EXPENSE *********************************
+
+Future<void> deleteExpense(int id) async {
+  final db = await initDatabase();
+  await db.rawQuery(
+    'DELETE FROM expense WHERE id =?',[id]
+  );
+  print('Expense Deleted');
+}

@@ -4,6 +4,7 @@ import 'package:sqflite/sqflite.dart';
 import 'add_category.dart';
 import 'list_categorys.dart';
 import 'db.dart';
+import 'categories_page.dart';
 
 class addExpensesPage extends StatefulWidget {
   const addExpensesPage({super.key});
@@ -67,130 +68,170 @@ class _addExpensesPageState extends State<addExpensesPage> {
     expensesController;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.teal,
         title: const Text('Expense Form',
-          style: const TextStyle(
+          style: TextStyle(
               fontWeight: FontWeight.bold
           ),
         ),
         centerTitle: true,
       ),
       body: Center(
-        child: Column(
-          children: [
-            const SizedBox(height: 20,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ElevatedButton.icon(
-                    onPressed: (){},
-                    label: const Text('Payment Method'),
-                  icon: const Icon(Icons.payment),
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Colors.greenAccent)
-                  ),
-                ),
-                ElevatedButton.icon(
-                    onPressed: (){
-                      _navigateAndDisplaySelection(context); // push the alert widget and receive data from it.
-                      // showDialog(
-                      //   context: context,
-                      //   builder: (BuildContext context) {
-                      //     return listCategory();
-                      //   });
-                      },
-                    label: const Text('Category'),
-                    icon: const Icon(Icons.category),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              const SizedBox(height: 20,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton.icon(
+                      onPressed: (){},
+                      label: const Text('Payment Method'),
+                    icon: const Icon(Icons.payment),
                     style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.redAccent)
+                      backgroundColor: MaterialStateProperty.all<Color>(Colors.greenAccent)
                     ),
-                ),
+                  ),
+                  ElevatedButton.icon(
+                      onPressed: (){
+                       // push the alert widget and receive data from it.
+                        _navigateAndDisplaySelection(context);
+                      },
+                      label: const Text('Category',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            color: Colors.black
+                          )
 
-              ],
-            ),
-            const SizedBox(height: 15),
-            Padding(
-              padding: const EdgeInsets.all(6.0),
-              child: Center(
-                  child: TextField(
-                    controller: expensesController,
-                    decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.money_outlined),
-                      hintText: 'Enter Amount',
-                      labelText: 'Expense Amount',
-                      filled: true,
-                      border: OutlineInputBorder()
-                    ),
-                  )
+                        ),
+                      icon: const Icon(Icons.category,color: Colors.black,),
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(Colors.redAccent)
+                      ),
+                  ),
+
+                ],
               ),
-            ),
-             Padding(
-               padding: EdgeInsets.all(8.0),
-               child: Center(
-                 child: TextField(
-                   controller: expenseDescription,
-                   decoration: const InputDecoration(
-                     prefixIcon: Icon(Icons.comment),
-                     hintText: 'Description',
-                     filled: true
+              const SizedBox(height: 15),
+              Padding(
+                padding: const EdgeInsets.all(6.0),
+                child: Center(
+                    child: TextField(
+                      controller: expensesController,
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.money_outlined),
+                        hintText: 'Enter Amount',
+                        labelText: 'Expense Amount',
+                        filled: true,
+                        border: OutlineInputBorder()
+                      ),
+                    )
+                ),
+              ),
+               Padding(
+                 padding: const EdgeInsets.all(8.0),
+                 child: Center(
+                   child: TextField(
+                     controller: expenseDescription,
+                     decoration: const InputDecoration(
+                       prefixIcon: Icon(Icons.comment),
+                       hintText: 'Description',
+                       filled: true
+                     ),
                    ),
                  ),
                ),
-             ),
-             const SizedBox(height: 20,),
-             Row(
-               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-               children: [
-                 ElevatedButton(
-                      onPressed: (){
-                        insertExpense(
-                            expensesController.text,
-                            expenseDescription.text,
-                            "${now.year}-${now.month}-${now.day}",
-                            expenseCategory,
-                        );
-                        clear_textfields();
-                        final snackBar = SnackBar(
-                          content: const Text('Expense Added Successfully'),
-                          action: SnackBarAction(
-                            label: 'Undo',
-                            onPressed: () {
-                              // Some code to undo the change.
-                            },
-                          ),
-                        );
+               const SizedBox(height: 20,),
+               Row(
+                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                 children: [
+                   ElevatedButton(
+                        onPressed: (){
+                          if(expensesController.text.isEmpty && expenseDescription.text.isEmpty && expenseCategory.isEmpty){
+                              print('Nothing');
+                          } else{
+                            insertExpense(
+                              expensesController.text,
+                              expenseDescription.text,
+                              "${now.year}-${now.month}-${now.day}",
+                              expenseCategory,
+                            );
+                          }
+                          clear_textfields();
+                          final snackBar = SnackBar(
+                            content: const Text('Expense Added Successfully'),
+                            action: SnackBarAction(
+                              label: 'Undo',
+                              onPressed: () {
+                                // Some code to undo the change.
+                              },
+                            ),
+                          );
 
-                        // Find the ScaffoldMessenger in the widget tree
-                        // and use it to show a SnackBar.
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      },
-                      child: const Text('Submit'),
-                  ),
-                ElevatedButton(
-                      onPressed: (){
-                        clear_textfields();
-                      },
-                      child: Text('Cancel')
+                          // Find the ScaffoldMessenger in the widget tree
+                          // and use it to show a SnackBar.
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        },
+                        child: const Text('Submit',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold
+                        ),
+                        ),
                     ),
-               ],
-             ),
-            SizedBox(height: 15,),
-            TextButton(
-                onPressed:(){
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context){
-                        return const addCategoryDialog();
-                      },
-                  );
-                },
-                child: const Text('Add Category'))
-          ],
+                  ElevatedButton(
+                        onPressed: (){
+                          clear_textfields();
+                        },
+                        child: const Text('Cancel',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      ),
+                 ],
+               ),
+              const SizedBox(height: 15,),
+
+              ElevatedButton(
+                  onPressed:(){
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context){
+                          return const addCategoryDialog();
+                                                 },
+                    );
+                  },
+                  child:const Text('Add Category',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold
+                      ),
+                  ),
+              ),
+              const SizedBox(height: 10,),
+              ElevatedButton(
+                  onPressed: (){
+                    Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => const categoryPage()),);
+
+                  },
+                style: const ButtonStyle(
+              //backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrangeAccent)
+                 ),
+                  child: const Text('Manage Category List',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold
+                    ),
+                  ),
+              )
+            ],
+          ),
         ),
       ),
     );

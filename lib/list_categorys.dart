@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
@@ -61,37 +60,41 @@ class _listCategoryState extends State<listCategory> {
     fetchData();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Select Category'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListView.builder(
-            itemCount: myData.length,
-              shrinkWrap: true,
-              itemBuilder:(context, index){
-                return ListTile(
-                  title: Text('${myData[index]['category_name']}'),
-                  onTap: (){
-                    Navigator.pop(context,'${myData[index]['category_name']}'); // return category name to parent widget.
-                  },
-                );
-             }
-          ),
-          Divider(),
-          ElevatedButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel',
-              style: TextStyle(
-                fontWeight: FontWeight.bold
-              ),)
-          )
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Select Category.'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+           children:[
+             ListView.builder(
+                shrinkWrap: true,
+                itemCount: myData.length,
+                itemBuilder:(context, index){
+                   return Card(
+                     elevation: 2,
+                     child: Padding(
+                       padding: const EdgeInsets.all(8.0),
+                       child: ListTile(
+                         leading: Image.asset('assets/images/options.png'),
+                          title: Text('${myData[index]['category_name']}',
+                              style: const TextStyle(
+                                 fontWeight: FontWeight.bold
+                                ),
+                              ),
+                          onTap: (){
+                            Navigator.pop(context,'${myData[index]['category_name']}'); // return category name to parent widget.
+                           },
+                          ),
+                     ),
+                   );
+              }
+           ),
+        ]
+        ),
       ),
     );
   }

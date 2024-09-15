@@ -46,7 +46,7 @@ class _CalendarPageState extends State<CalendarPage> {
             padding: const EdgeInsets.all(8.0),
             child: TableCalendar(
               firstDay: DateTime.utc(2023, 1, 1),
-              lastDay: DateTime.utc(2023, 12, 31),
+              lastDay: DateTime.utc(2030, 12, 31),
               focusedDay: _focusedDay,
               calendarFormat: _calendarFormat,
               selectedDayPredicate: (day){
@@ -88,8 +88,21 @@ class _CalendarPageState extends State<CalendarPage> {
                 itemBuilder: (context, index){
                   return ListTile(
                     leading: Image.asset('assets/images/cost.png'),
-                    title: Text('${dayExpenses[index]['category']}'),
-                    trailing: Text('Ksh. ${dayExpenses[index]['expense_amount']}'),
+                    title: Text('${dayExpenses[index]['category']}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold
+                      ),
+                    ),
+                    subtitle: Text('Ksh. ${dayExpenses[index]['expense_amount']}'),
+                    trailing: IconButton(
+                      onPressed: (){
+                       deleteExpense(dayExpenses[index]['id']);
+                      },
+                      icon: const Icon(Icons.clear, color: Colors.indigo,),
+                    ),
+                    onTap: (){
+
+                    },
                   );
                 }
             ),
