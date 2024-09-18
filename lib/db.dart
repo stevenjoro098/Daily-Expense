@@ -154,7 +154,6 @@ Future<List> categorySum(int month, int year) async {
     GROUP BY category;
     
   ''');
-
   // Create a set of all unique categories from the result
   Set<String> allCategories = Set.from(result.map((item) => item['category'] as String));
 

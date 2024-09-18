@@ -6,7 +6,7 @@ class ExpenseBarChart extends StatefulWidget {
   final int month; // Parameter to pass
   final int year;    // Another parameter
 
-  const ExpenseBarChart({Key? key, required this.month, required this.year}) : super(key: key);
+  const  ExpenseBarChart({Key? key, required this.month, required this.year}) : super(key: key);
 
   @override
   _ExpenseBarChartState createState() => _ExpenseBarChartState();
@@ -21,6 +21,14 @@ class _ExpenseBarChartState extends State<ExpenseBarChart> {
     fetchDataAndSetState();
   }
 
+  @override
+  void didUpdateWidget(covariant ExpenseBarChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Check if month or year has changed
+    if (oldWidget.month != widget.month || oldWidget.year != widget.year) {
+      fetchDataAndSetState();
+    }
+  }
   List<charts.Color> colorsList = [
     charts.MaterialPalette.blue.shadeDefault,
     charts.MaterialPalette.red.shadeDefault,
@@ -48,19 +56,38 @@ class _ExpenseBarChartState extends State<ExpenseBarChart> {
     setState(() {
       _seriesList = series;
     });
+
   }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200, // Adjust height as needed
-      child: charts.BarChart(
-        _seriesList,
-        animate: true,
-        vertical: true,
-        barRendererDecorator: charts.BarLabelDecorator<String>(),
-        // domainAxis: const charts.OrdinalAxisSpec(
-        //   renderSpec: charts.NoneRenderSpec(),
-        // ),
+    return Card(
+      elevation: 3,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            const Text('Expense Chart Bar',
+              style: TextStyle(
+                letterSpacing: 2.5,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20,),
+            SizedBox(
+              height: 200, // Adjust height as needed
+              child: charts.BarChart(
+                _seriesList,
+                animate: true,
+                vertical: true,
+                barRendererDecorator: charts.BarLabelDecorator<String>(),
+                // domainAxis: const charts.OrdinalAxisSpec(
+                //   renderSpec: charts.NoneRenderSpec(),
+                // ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

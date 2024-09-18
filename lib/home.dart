@@ -25,6 +25,9 @@ class _HomePageState extends State<HomePage> {
 
   DateTime getTodaysDate() {
     DateTime now = DateTime.now();
+    setState(() {
+      selectedMonth = now.month;
+    });
     return DateTime(now.year, now.month, now.day);
   }
 
@@ -90,6 +93,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState(){
     super.initState();
+    getTodaysDate();
     getCurrentMonth();
     fetchExpenseData();
     getTodayTotal();
@@ -99,7 +103,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(10.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -156,9 +161,8 @@ class _HomePageState extends State<HomePage> {
                     });
                     //print("Month Code:${ selectedMonth}");
                     categorySum(selectedMonth, now.year);
-                    getMonthlyTotal(selectedMonth);
-                    //ExpenseBarChart(month: selectedMonth, year:now.year);
 
+                    getMonthlyTotal(selectedMonth);
 
                   },
                   items: <String>['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -172,15 +176,9 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             const SizedBox(height: 5,),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                  child:Card(
-                    elevation: 3,
-                      child: ExpenseBarChart(month: now.month, year: now.year)
-                  )
-              ),
-            ),
+            Center(
+                child:ExpenseBarChart(month: selectedMonth, year: now.year)
+                ),
             Card(
               child: ListTile(
                 leading: const Text("Today's Expenditure:",
