@@ -1,4 +1,6 @@
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
@@ -20,7 +22,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String selectedValue = '';
   int selectedMonth = 0;
-
+  String month = "";
+  String monthlyIncomeTotal = "";
+  String monthlyBalance = "";
+  String currency = "";
   List<Map<String, dynamic>> myData = [];
   double dailyTotal = 0.0;
   double monthlyTotal = 0.0;
@@ -45,6 +50,9 @@ class _HomePageState extends State<HomePage> {
     ];
     String currentMonthName = months[now.month - 1]; // Subtract 1 because the index starts from 0
     selectedValue = currentMonthName;
+    setState(() {
+      month = currentMonthName;
+    });
   }
 
   Future<void> fetchExpenseData() async {
@@ -92,7 +100,16 @@ class _HomePageState extends State<HomePage> {
       });
     });
   }
-
+  void getIncomeTotal(){
+    double bal = 0.0;
+    totalMonthIncome(now.month.toString(),now.year.toString()).then((value){
+      bal = value - monthlyTotal;
+      setState(() {
+        monthlyIncomeTotal = value.toString();
+        monthlyBalance = bal.toString();
+      });
+    });
+  }
   @override
   void initState(){
     super.initState();
@@ -101,6 +118,7 @@ class _HomePageState extends State<HomePage> {
     fetchExpenseData();
     getTodayTotal();
     getMonthlyTotal(now.month);
+    getIncomeTotal();
   }
   @override
   Widget build(BuildContext context) {
@@ -108,17 +126,33 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Image.asset('assets/images/statistics.png', width: 40,),
         centerTitle: true,
-        leading: const Icon(Icons.menu),
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
         actions: [
           Icon(Icons.notifications)
         ],
+      ),
+      drawer: Drawer(
+          child: Column(
+            children: [
+
+            ],
+          )// Populate the Drawer in the last step.
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
+            children: <Widget>[
               const Row(
                 children: [
                   Text('Hello, Steve',
@@ -130,15 +164,24 @@ class _HomePageState extends State<HomePage> {
                   )
                 ],
               ),
+              Divider(),
               Card(
+                color: Colors.blue[100],
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
-                      Text('Ksh. 200000',
+                      const Text('Balance',
                         style: TextStyle(
+                            fontFamily: 'Tillium',
+                            color: Colors.grey,
+                            fontSize: 22
+                        ),
+                      ),
+                      Text('Ksh. $monthlyBalance ',
+                        style: const TextStyle(
                           fontFamily: 'Tillium',
-                          fontSize: 30
+                          fontSize: 27
                          ),
                       ),
                       const SizedBox(height: 10,),
@@ -148,11 +191,12 @@ class _HomePageState extends State<HomePage> {
                           Row(
                             children: [
                               const Icon(Icons.expand_circle_down_rounded, color: Colors.green,),
-                              SizedBox(width: 5,),
-                              Text('KSh. $monthlyTotal',
+                              const SizedBox(width: 5,),
+                              Text('KSh.$monthlyIncomeTotal',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 15
+                                      fontFamily: 'Tillium',
+                                      fontSize: 17
                                   ),
                                 ),
                             ],
@@ -161,11 +205,12 @@ class _HomePageState extends State<HomePage> {
                           Row(
                             children: [
                               const Icon(Icons.upload, color: Colors.redAccent),
-                              SizedBox(width: 5,),
-                              Text('KSh. $monthlyTotal',
+                              const SizedBox(width: 5,),
+                              Text('KSh.$monthlyTotal',
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 15
+                                    fontFamily: 'Tillium',
+                                    fontSize: 17
                                 ),
                               ),
                             ],
@@ -182,10 +227,29 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   CupertinoSegmentedControl<int>(
-                    pressedColor: Colors.blue,
+                    padding: const EdgeInsets.all(8),  // Add padding for better appearance
+                    borderColor: Colors.black54,    // Customize the border color
+                    pressedColor: Colors.blue.shade100, // Color when a segment is pressed
+                    selectedColor: Colors.black,  // Color for the selected segment
+                    unselectedColor: Colors.teal[100], // Background color for unselected segments
                     children: const {
-                      0: Text('Expenses'),
-                      1: Text('Income'),
+                      0: Padding(
+                          padding: const EdgeInsets.all(8),
+                        child:Text(
+                            'Expenses',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.redAccent
+                          ),
+                        ) ,
+                      ),
+                      1: Text(
+                          'Income',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green
+                        ),
+                      ),
                     },
                     onValueChanged: (int value) {
                       if(value == 0){
@@ -201,33 +265,47 @@ class _HomePageState extends State<HomePage> {
                     },
                     //groupValue: segmentedValue,
                   ),
-                  DropdownButton<String>(
-                    value: selectedValue,
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    elevation: 10,
-                    style: const TextStyle(color: Colors.deepPurple),
-                    underline: Container(
-                      height: 3,
-                      color: Colors.deepPurpleAccent,
+                  SizedBox(
+                    height: 40,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent.withOpacity(0.1), // Background color
+                        borderRadius: BorderRadius.circular(10),   // Rounded corners
+                        border: Border.all(color: Colors.blueAccent, width: 2), // Border styling
+                      ),
+                      child:DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedValue,
+                          focusColor: Colors.transparent,
+                          icon: const Icon(Icons.arrow_drop_down, color: Colors.blueAccent, size: 24), // Custom arrow icon
+                          dropdownColor: Colors.blue[50], // Dropdown background color
+                          style: TextStyle(
+                            color: Colors.blueAccent, // Text color in the dropdown
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          onChanged: (newValue){
+                            setState(() {
+                              selectedValue = newValue!;
+                              selectedMonth = _getMonthNumber(selectedValue);
+                            });
+                            //print("Month Code:${ selectedMonth}");
+                            categorySum(selectedMonth, now.year);
+
+                            getMonthlyTotal(selectedMonth);
+
+                          },
+                          items: <String>['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ),
-                    onChanged: (newValue){
-                      setState(() {
-                        selectedValue = newValue!;
-                        selectedMonth = _getMonthNumber(selectedValue);
-                      });
-                      //print("Month Code:${ selectedMonth}");
-                      categorySum(selectedMonth, now.year);
-        
-                      getMonthlyTotal(selectedMonth);
-        
-                    },
-                    items: <String>['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
                   )
                 ],
               ),
@@ -242,8 +320,9 @@ class _HomePageState extends State<HomePage> {
                   leading: const Text("Today's Expenditure:",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 15
-                    ),),
+                        fontSize: 15,
+                    ),
+                  ),
                   trailing: Text('Ksh. $dailyTotal',
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,

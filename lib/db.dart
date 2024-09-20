@@ -109,6 +109,22 @@ class Category{
        print("Income${ result }");
        return result;
     }
+  // ****************************Total Income for Month ******************************************
+Future<double> totalMonthIncome(String month, String year) async {
+  final db = await initDatabase();
+  final List<Map<String, dynamic>> result = await db.rawQuery(
+    '''
+        SELECT SUM(income_amount) AS total_amount 
+        FROM income
+        WHERE strftime('%m', income_date) = ?
+              AND strftime('%Y', income_date) = ?
+    ''',
+      ["0${month}",year]);
+  double totalIncomeAmount = (result.first['total_amount'] ?? 0.0) as double;
+  print('Months total Income: $totalIncomeAmount');
+
+  return totalIncomeAmount;
+}
   //****************************************************************************
    Future<void> insertCategory(String category) async {
      final db = await initDatabase();
@@ -141,28 +157,28 @@ class Category{
   }
   // ***************************** List All Expenses ***************************
 
-Future<List<Map<String, dynamic>>> AllExpenseList() async {
-  final db = await initDatabase();
-  // Ensure the month is two digits
-  int formattedMonth = 9;
-  int year = 2024;
-  final List<Map<String, dynamic>> result = await db.rawQuery(
-      '''
-    SELECT *
-    FROM expense
-    WHERE expense_date LIKE '${year}-${formattedMonth}%'
-    ''',
+  Future<List<Map<String, dynamic>>> AllExpenseList() async {
+      final db = await initDatabase();
+      // Ensure the month is two digits
+      int formattedMonth = 9;
+      int year = 2024;
+      final List<Map<String, dynamic>> result = await db.rawQuery(
+          '''
+        SELECT *
+        FROM expense
+        WHERE expense_date LIKE '${year}-${formattedMonth}%'
+        ''',
 
-  );
+      );
 
- // print(result);  // Debug: print the result
-  return result;
-}
+     // print(result);  // Debug: print the result
+      return result;
+    }
 
 
   // *************************** Total Daily Expenditure Amount ****************
 
-  Future<double> totalDayAmount(String date) async {
+  Future<double>totalDayAmount(String date) async {
     final db = await initDatabase();
     print('Date: $date');
     final List<Map<String, dynamic>> result = await db.rawQuery(
