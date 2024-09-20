@@ -94,11 +94,27 @@ flutter:
     - assets/images/edit.png
     - assets/images/delete.png
     - assets/images/options.png
+    - assets/images/spend.png
+    - assets/images/money.png
+    - assets/images/edit.png
+    - assets/images/schedule.png
+    - assets/images/pie-chart.png
+    - assets/images/happiness.png
+    - assets/images/statistics.png
   fonts:
      - family: Poppins
        fonts:
          - asset: assets/fonts/Poppins-Regular.ttf
          - asset: assets/fonts/Poppins-SemiBold.ttf
+
+     - family: DancingScript
+       fonts:
+         - asset: assets/fonts/DancingScript-Regular.ttf
+
+     - family: Tillium
+       fonts:
+         - asset: assets/fonts/TitilliumWeb-Regular.ttf
+
 
   #   - family: Schyler
   #     fonts:

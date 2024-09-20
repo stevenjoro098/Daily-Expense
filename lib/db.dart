@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:async';
@@ -33,7 +34,7 @@ class Category{
 
   Future<Database> initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
-     String path = join(documentsDirectory.path, 'expenses.db');
+     String path = join(documentsDirectory.path, 'expensesIncome.db');
      return openDatabase(
          path,
          version: 1,
@@ -52,10 +53,63 @@ class Category{
                   description TEXT, 
                   expense_date DATE )
               ''');
+            await database.execute('''
+            CREATE TABLE IF NOT EXISTS income(
+                  id INTEGER PRIMARY KEY,
+                  income_amount DOUBLE, 
+                  income_description TEXT, 
+                  income_date DATE )
+              ''');
             print('table created');
          },
      );
   }
+  //**********************************Income Insert ********************************
+  Future<void> insertIncome(BuildContext context, String IncomeAmount, String IncomeDescription, String IncomeDate) async {
+  final db = await initDatabase();
+  print('Income insert method called');
+  await db.insert(
+      'income',
+      {
+        'income_amount': IncomeAmount,
+        'income_description': IncomeDescription,
+        'income_date': IncomeDate
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace
+  );
+  final snackBar = SnackBar(
+    content: const Text('Income Added Successfully'),
+    action: SnackBarAction(
+      label: 'Undo',
+      onPressed: () {
+        // Some code to undo the change.
+      },
+    ),
+  );
+
+  // Find the ScaffoldMessenger in the widget tree
+  // and use it to show a SnackBar.
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}
+  //****************************************************************************
+    Future<List<Map<String, dynamic>>> groupIncome() async {
+       final db = await initDatabase();
+       final List<Map<String, dynamic>> result = await db.rawQuery('''
+            SELECT 
+                strftime('%m', income_date) AS month, 
+                strftime('%Y', income_date) AS year, 
+                SUM(income_amount) AS total_income
+            FROM 
+                income
+            GROUP BY 
+                strftime('%Y-%m', income_date)
+            ORDER BY 
+                year, month
+      ''');
+       print("Income${ result }");
+       return result;
+    }
+  //****************************************************************************
    Future<void> insertCategory(String category) async {
      final db = await initDatabase();
      print('insert method called');

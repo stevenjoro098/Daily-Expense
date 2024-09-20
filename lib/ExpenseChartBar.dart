@@ -3,10 +3,10 @@ import 'package:charts_flutter/flutter.dart' as charts;
 import 'db.dart';
 
 class ExpenseBarChart extends StatefulWidget {
-  final int month; // Parameter to pass
+  final int MonthIndex; // Parameter to pass
   final int year;    // Another parameter
 
-  const  ExpenseBarChart({Key? key, required this.month, required this.year}) : super(key: key);
+  const  ExpenseBarChart({Key? key, required this.MonthIndex, required this.year}) : super(key: key);
 
   @override
   _ExpenseBarChartState createState() => _ExpenseBarChartState();
@@ -14,6 +14,24 @@ class ExpenseBarChart extends StatefulWidget {
 
 class _ExpenseBarChartState extends State<ExpenseBarChart> {
   late List<charts.Series<dynamic, String>> _seriesList=[];
+
+  Object _getMonthNumber(int monthName) {
+    const monthMap = {
+       1: "JANUARY",
+       2:'FEBRUARY',
+       3:'MARCH',
+       4:'APRIL',
+       5:'MAY',
+       6:'JUNE',
+       7:'JULY',
+       8:'AUGUST',
+       9:'SEPTEMBER',
+      10:'OCTOBER',
+      11:'NOVEMBER',
+      12:'DECEMBER',
+    };
+    return monthMap[monthName] ?? DateTime.now().month; // Default to current month
+  }
 
   @override
   void initState() {
@@ -25,7 +43,7 @@ class _ExpenseBarChartState extends State<ExpenseBarChart> {
   void didUpdateWidget(covariant ExpenseBarChart oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Check if month or year has changed
-    if (oldWidget.month != widget.month || oldWidget.year != widget.year) {
+    if (oldWidget.MonthIndex != widget.MonthIndex || oldWidget.year != widget.year) {
       fetchDataAndSetState();
     }
   }
@@ -39,7 +57,7 @@ class _ExpenseBarChartState extends State<ExpenseBarChart> {
     charts.MaterialPalette.purple.shadeDefault
   ];
   Future<void> fetchDataAndSetState() async {
-    List data = await categorySum(widget.month, widget.year);
+    List data = await categorySum(widget.MonthIndex, widget.year);
     List<charts.Series<dynamic, String>> series = [
       charts.Series(
         id: 'Category Total',
@@ -67,7 +85,7 @@ class _ExpenseBarChartState extends State<ExpenseBarChart> {
         padding: const EdgeInsets.all(12.0),
         child: Column(
           children: [
-            const Text('Expense Chart Bar',
+            Text('${ _getMonthNumber(widget.MonthIndex)} Expense Chart Bar',
               style: TextStyle(
                 letterSpacing: 2.5,
                 fontWeight: FontWeight.bold,

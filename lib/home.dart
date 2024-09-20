@@ -1,11 +1,14 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 
 import 'ExpenseChartBar.dart';
 import 'db.dart';
 import 'calendar.dart';
 import 'add_expenditure.dart';
 import '_helperFn.dart';
+import 'IncomePage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -98,112 +101,180 @@ class _HomePageState extends State<HomePage> {
     fetchExpenseData();
     getTodayTotal();
     getMonthlyTotal(now.month);
-    //categorySum(now.month, now.year);
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 25),
-            Container(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      appBar: AppBar(
+        title: Image.asset('assets/images/statistics.png', width: 40,),
+        centerTitle: true,
+        leading: const Icon(Icons.menu),
+        actions: [
+          Icon(Icons.notifications)
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Row(
                 children: [
-                  const Icon(Icons.menu),
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('This Month Expenditure',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold
-
-                        ),),
-                      Text('KSh. $monthlyTotal',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Icon(Icons.notifications)
+                  Text('Hello, Steve',
+                    style: TextStyle(
+                      fontFamily: 'DancingScript',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30
+                    ),
+                  )
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                CupertinoSegmentedControl<int>(
-                  children: const {
-                    0: Text('Expenses'),
-                    1: Text('Income'),
-                  },
-                  onValueChanged: (int value) {
-                    setState(() {
-                      Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => const CalendarPage()),);
-                    });
-                  },
-                  //groupValue: segmentedValue,
-                ),
-                DropdownButton<String>(
-                  value: selectedValue,
-                  onChanged: (newValue){
-                    setState(() {
-                      selectedValue = newValue!;
-                      selectedMonth = _getMonthNumber(selectedValue);
-                    });
-                    //print("Month Code:${ selectedMonth}");
-                    categorySum(selectedMonth, now.year);
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      Text('Ksh. 200000',
+                        style: TextStyle(
+                          fontFamily: 'Tillium',
+                          fontSize: 30
+                         ),
+                      ),
+                      const SizedBox(height: 10,),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.expand_circle_down_rounded, color: Colors.green,),
+                              SizedBox(width: 5,),
+                              Text('KSh. $monthlyTotal',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15
+                                  ),
+                                ),
+                            ],
+                          ),
+                            //leading: Icon(Icons.arrow_drop_down),
+                          Row(
+                            children: [
+                              const Icon(Icons.upload, color: Colors.redAccent),
+                              SizedBox(width: 5,),
+                              Text('KSh. $monthlyTotal',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      )
 
-                    getMonthlyTotal(selectedMonth);
+                    ]
 
-                  },
-                  items: <String>['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                )
-              ],
-            ),
-            const SizedBox(height: 5,),
-            Center(
-                child:ExpenseBarChart(month: selectedMonth, year: now.year)
-                ),
-            Card(
-              child: ListTile(
-                leading: const Text("Today's Expenditure:",
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15
-                  ),),
-                trailing: Text('Ksh. ${dailyTotal}',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16
                   ),
                 ),
               ),
-            ),
-
-            Expanded(
-              child: myData.isEmpty ?
-              Container(
-                child: Center(
-                  // Show GIF when the list is empty
-                  child: Image.asset(
-                    'assets/images/empty_list.gif',
-                    width: 300, // Adjust width as needed
-                    height: 300, // Adjust height as needed
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  CupertinoSegmentedControl<int>(
+                    pressedColor: Colors.blue,
+                    children: const {
+                      0: Text('Expenses'),
+                      1: Text('Income'),
+                    },
+                    onValueChanged: (int value) {
+                      if(value == 0){
+                        setState(() {
+                          Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => const CalendarPage()),);
+                        });
+                      } else {
+                        Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const IncomePage()),);
+                      }
+        
+                    },
+                    //groupValue: segmentedValue,
+                  ),
+                  DropdownButton<String>(
+                    value: selectedValue,
+                    icon: const Icon(Icons.keyboard_arrow_down),
+                    elevation: 10,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 3,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (newValue){
+                      setState(() {
+                        selectedValue = newValue!;
+                        selectedMonth = _getMonthNumber(selectedValue);
+                      });
+                      //print("Month Code:${ selectedMonth}");
+                      categorySum(selectedMonth, now.year);
+        
+                      getMonthlyTotal(selectedMonth);
+        
+                    },
+                    items: <String>['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  )
+                ],
+              ),
+              const SizedBox(height: 5,),
+              Center(
+                  child:ExpenseBarChart(MonthIndex: selectedMonth, year: now.year)
+                  ),
+              const Divider(),
+              Card(
+                elevation: 3,
+                child: ListTile(
+                  leading: const Text("Today's Expenditure:",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15
+                    ),),
+                  trailing: Text('Ksh. $dailyTotal',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10,),
+              myData.isEmpty ?
+              Card(
+                elevation: 3,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children:[
+                      Image.asset('assets/images/spend.png', width: 120,),
+        
+                      const Text(
+                          'No Spending Today!!',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold
+                        ),
+                      ),
+                      // Image.asset(
+                      //   'assets/images/empty_list.gif',
+                      //   width: 250, // Adjust width as needed
+                      //   height: 250, // Adjust height as needed
+                      // ),
+                    ]
                   ),
                 ),
               )
@@ -236,19 +307,18 @@ class _HomePageState extends State<HomePage> {
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.teal
-                                  ),),
-                                content: Container(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      ListTile(
-                                        leading: Icon(Icons.description),
-                                        title: Text(myData[index]['description']),
-                                        subtitle:Text('${myData[index]['expense_date']}'),
-                                        trailing: Text('Ksh. ${myData[index]['expense_amount']}'),
-                                      )
-                                    ],
                                   ),
+                                ),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      //leading: Icon(Icons.description),
+                                      title: Text(myData[index]['description']),
+                                      subtitle:Text('${myData[index]['expense_date']}'),
+                                      trailing: Text('Ksh. ${myData[index]['expense_amount']}'),
+                                    )
+                                  ],
                                 ),
                               );
                             }
@@ -257,8 +327,8 @@ class _HomePageState extends State<HomePage> {
                     );
                   }
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
