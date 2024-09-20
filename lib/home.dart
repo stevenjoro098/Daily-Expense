@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'ExpenseChartBar.dart';
 import 'db.dart';
@@ -11,6 +12,7 @@ import 'calendar.dart';
 import 'add_expenditure.dart';
 import '_helperFn.dart';
 import 'IncomePage.dart';
+import 'profile.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,6 +22,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String firstName = "";
   String selectedValue = '';
   int selectedMonth = 0;
   String month = "";
@@ -100,14 +103,21 @@ class _HomePageState extends State<HomePage> {
       });
     });
   }
-  void getIncomeTotal(){
+  void getIncomeTotal(int month, int year){
     double bal = 0.0;
-    totalMonthIncome(now.month.toString(),now.year.toString()).then((value){
+    totalMonthIncome(month.toString(),year.toString()).then((value){
       bal = value - monthlyTotal;
       setState(() {
         monthlyIncomeTotal = value.toString();
         monthlyBalance = bal.toString();
       });
+    });
+  }
+  Future<void> loadProfileData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      firstName = prefs.getString('firstName') ?? 'John';
+      currency = prefs.getString('currency') ?? 'Usd';
     });
   }
   @override
@@ -118,7 +128,8 @@ class _HomePageState extends State<HomePage> {
     fetchExpenseData();
     getTodayTotal();
     getMonthlyTotal(now.month);
-    getIncomeTotal();
+    getIncomeTotal(now.month, now.year);
+    loadProfileData();
   }
   @override
   Widget build(BuildContext context) {
@@ -137,26 +148,57 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         actions: [
-          Icon(Icons.notifications)
         ],
       ),
       drawer: Drawer(
-          child: Column(
+          child: ListView(
             children: [
+                DrawerHeader(
+                    decoration: const BoxDecoration(
+                    color: Colors.blueAccent,
+                    ),
+                  child: Image.asset('assets/images/pie-chart.png', width: 200,)
+                ),
+              ListTile(
+                title: const Text('Profile'),
+                leading: Icon(Icons.person),
+                onTap: () {
+                  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const Profile()),);
 
+                },
+              ),
+              ListTile(
+                title: const Text('Statistics'),
+                leading: Icon(Icons.bar_chart),
+                onTap: () {
+                },
+              ),
+              ListTile(
+                title: const Text('Settings'),
+                leading: Icon(Icons.settings),
+                onTap: () {
+                },
+              ),
+              ListTile(
+                title: const Text('Sign Out'),
+                leading: Icon(Icons.exit_to_app),
+                onTap: () {
+                },
+              ),
             ],
           )// Populate the Drawer in the last step.
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const Row(
+               Row(
                 children: [
-                  Text('Hello, Steve',
-                    style: TextStyle(
+                  Text('Hello, $firstName.',
+                    style: const TextStyle(
                       fontFamily: 'DancingScript',
                       fontWeight: FontWeight.bold,
                       fontSize: 30
@@ -164,9 +206,10 @@ class _HomePageState extends State<HomePage> {
                   )
                 ],
               ),
-              Divider(),
+              //Divider(),
               Card(
                 color: Colors.blue[100],
+                elevation: 3,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
@@ -178,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                             fontSize: 22
                         ),
                       ),
-                      Text('Ksh. $monthlyBalance ',
+                      Text('$currency. $monthlyBalance ',
                         style: const TextStyle(
                           fontFamily: 'Tillium',
                           fontSize: 27
@@ -192,7 +235,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               const Icon(Icons.expand_circle_down_rounded, color: Colors.green,),
                               const SizedBox(width: 5,),
-                              Text('KSh.$monthlyIncomeTotal',
+                              Text('$currency. $monthlyIncomeTotal',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'Tillium',
@@ -206,7 +249,7 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               const Icon(Icons.upload, color: Colors.redAccent),
                               const SizedBox(width: 5,),
-                              Text('KSh.$monthlyTotal',
+                              Text('$currency. $monthlyTotal',
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontFamily: 'Tillium',
@@ -223,8 +266,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
+              SizedBox(height: 4,),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CupertinoSegmentedControl<int>(
                     padding: const EdgeInsets.all(8),  // Add padding for better appearance
@@ -292,7 +336,7 @@ class _HomePageState extends State<HomePage> {
                             });
                             //print("Month Code:${ selectedMonth}");
                             categorySum(selectedMonth, now.year);
-
+                            getIncomeTotal(selectedMonth, now.year);
                             getMonthlyTotal(selectedMonth);
 
                           },
@@ -323,7 +367,7 @@ class _HomePageState extends State<HomePage> {
                         fontSize: 15,
                     ),
                   ),
-                  trailing: Text('Ksh. $dailyTotal',
+                  trailing: Text('$currency. $dailyTotal',
                     style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16
@@ -370,7 +414,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       trailing: Text(
-                        'Ksh. ${myData[index]['expense_amount']}',
+                        '$currency. ${myData[index]['expense_amount']}',
                         style: const TextStyle(
                             color: Colors.blueAccent,
                             fontWeight: FontWeight.bold,

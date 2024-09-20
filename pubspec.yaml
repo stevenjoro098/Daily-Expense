@@ -36,6 +36,7 @@ dependencies:
   sqlite3_flutter_libs:
   table_calendar: 3.0.8
   flutter_local_notifications:
+  shared_preferences: ^2.0.6
 
 
 
