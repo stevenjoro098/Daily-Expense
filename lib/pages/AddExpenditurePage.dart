@@ -17,21 +17,34 @@ class addExpensesPage extends StatefulWidget {
 class _addExpensesPageState extends State<addExpensesPage> {
   String expenseCategory = "";
   DateTime now = DateTime.now();
+  final _formKey = GlobalKey<FormState>();
  TextEditingController expensesController = TextEditingController();
  TextEditingController expenseDescription = TextEditingController();
 
   Future<void> insertExpense(String expense, String description, String expense_date, String category) async {
     final db = await initDatabase();
-    print('Expense insert Method Called');
-    await db.insert(
-      'expense',
-      {'expense_amount': expense,
-        'description': description,
-        'expense_date': expense_date,
-        'category': category
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace
-    );
+    if(_formKey.currentState!.validate()){
+      print(_formKey.currentWidget);
+      // print('Expense insert Method Called');
+      // await db.insert(
+      //     'expense',
+      //     {'expense_amount': expense,
+      //       'description': description,
+      //       'expense_date': expense_date,
+      //       'category': category
+      //     },
+      //     conflictAlgorithm: ConflictAlgorithm.replace
+      // );
+      // final snackBar = const SnackBar(
+      //   content: Text('Expense Added Successfully'),
+      // );
+      //
+      // // Find the ScaffoldMessenger in the widget tree
+      // // and use it to show a SnackBar.
+      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    }
+
   }
   Future<void> _navigateAndDisplaySelection(BuildContext context) async {
     // Navigator.push returns a Future that completes after calling
@@ -85,61 +98,58 @@ class _addExpensesPageState extends State<addExpensesPage> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              const SizedBox(height: 20,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton.icon(
-                      onPressed: (){
-                       // push the alert widget and receive data from it.
-                        _navigateAndDisplaySelection(context);
-                      },
-                      label: const Text('Category',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: Colors.black
-                          )
-
-                        ),
-                      icon: const Icon(Icons.category,color: Colors.black,),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(Colors.redAccent)
-                      ),
-                  ),
-
-                ],
-              ),
               const SizedBox(height: 15),
               Form(
+                key: _formKey,
                   child: Column(
                     children: [
                       Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: Center(
-                            child: TextField(
+                            child: TextFormField(
                               controller: expensesController,
                               decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.money_outlined),
+                                  prefixIcon: Icon(Icons.money_rounded),
                                   hintText: 'Enter Amount',
                                   labelText: 'Expense Amount',
                                   filled: true,
                                   border: OutlineInputBorder()
                               ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please Enter Amount';
+                                }
+                                return null;
+                              },
                             )
                         ),
                       ),
+                      Card(
+                        child: ListTile(
+                          leading: Image.asset('assets/images/app.png', width: 40,),
+                          title: Text('Select Category: $expenseCategory'),
+                          onTap: (){
+                            _navigateAndDisplaySelection(context);
+                          },
 
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Center(
-                          child: TextField(
+                          child: TextFormField(
                             controller: expenseDescription,
                             decoration: const InputDecoration(
                                 prefixIcon: Icon(Icons.comment),
                                 hintText: 'Description',
                                 filled: true
                             ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please Enter a Description';
+                              }
+                              return null;
+                            },
                           ),
                         ),
                       ),
@@ -155,30 +165,23 @@ class _addExpensesPageState extends State<addExpensesPage> {
                  children: [
                    ElevatedButton(
                         onPressed: (){
-                          if(expensesController.text.isEmpty && expenseDescription.text.isEmpty && expenseCategory.isEmpty){
-                              print('Nothing');
-                          } else{
-                            insertExpense(
-                              expensesController.text,
-                              expenseDescription.text,
-                              "${now.year}-${now.month}-${now.day}",
-                              expenseCategory,
-                            );
-                          }
-                          clear_textfields();
-                          final snackBar = SnackBar(
-                            content: const Text('Expense Added Successfully'),
-                            action: SnackBarAction(
-                              label: 'Undo',
-                              onPressed: () {
-                                // Some code to undo the change.
-                              },
-                            ),
+                          insertExpense(
+                            expensesController.text,
+                            expenseDescription.text,
+                            "${now.year}-${now.month}-${now.day}",
+                            expenseCategory,
                           );
+                          // if(expensesController.text.isEmpty && expenseDescription.text.isEmpty && expenseCategory.isEmpty){
+                          //
+                          // } else{
+                          //
+                          // }
+                          //clear_textfields();
+
 
                           // Find the ScaffoldMessenger in the widget tree
                           // and use it to show a SnackBar.
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
                         },
                         child: const Text('Submit',
                         style: TextStyle(
