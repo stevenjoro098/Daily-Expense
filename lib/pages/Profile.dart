@@ -106,7 +106,11 @@ class _ProfileState extends State<Profile> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child: Image.asset('assets/images/user.png', height: 100),
+              ),
               // Name Field
+              SizedBox(height: 20,),
               TextFormField(
                 controller: firstnameController,
                 enabled: isEditing,
@@ -162,7 +166,7 @@ class _ProfileState extends State<Profile> {
               TextFormField(
                 controller: phoneController,
                 enabled: isEditing,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Phone Number",
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.phone),
@@ -174,12 +178,12 @@ class _ProfileState extends State<Profile> {
                   return null;
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               // Phone Number Field
               TextFormField(
                 controller: currencyController,
                 enabled: isEditing,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: "Currency",
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.phone),

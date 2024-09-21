@@ -6,10 +6,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'add_expenditure.dart';
-import 'db.dart';
-import 'home.dart';
-import 'calendar.dart';
+import 'pages/AddExpenditurePage.dart';
+import 'utils/db.dart';
+import 'pages/Home.dart';
+import 'widgets/calendar.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 

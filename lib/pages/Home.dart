@@ -6,13 +6,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'ExpenseChartBar.dart';
-import 'db.dart';
-import 'calendar.dart';
-import 'add_expenditure.dart';
-import '_helperFn.dart';
+import '../widgets/ExpenseChartBar.dart';
+import '../utils/db.dart';
+import '../widgets/calendar.dart';
+import 'AddExpenditurePage.dart';
+import '../utils/_helperFn.dart';
 import 'IncomePage.dart';
-import 'profile.dart';
+import 'Profile.dart';
+import 'package:daily_expenses/widgets/HomeAppBar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -148,6 +149,13 @@ class _HomePageState extends State<HomePage> {
           },
         ),
         actions: [
+          IconButton(
+              onPressed: (){},
+              icon:Icon(Icons.account_circle_outlined)
+          ),
+          IconButton(onPressed: (){},
+              icon:Icon(Icons.notifications)
+          )
         ],
       ),
       drawer: Drawer(
@@ -206,6 +214,17 @@ class _HomePageState extends State<HomePage> {
                   )
                 ],
               ),
+              Row(
+                children: [
+                  Text("Date: ${now.day}-${now.month}-${now.year}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+
+                  ),
+                  ),
+                ],
+              ),
               //Divider(),
               Card(
                 color: Colors.blue[100],
@@ -218,10 +237,11 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                             fontFamily: 'Tillium',
                             color: Colors.grey,
+                            fontWeight: FontWeight.bold,
                             fontSize: 22
                         ),
                       ),
-                      Text('$currency. $monthlyBalance ',
+                      Text('$currency.$monthlyBalance ',
                         style: const TextStyle(
                           fontFamily: 'Tillium',
                           fontSize: 27

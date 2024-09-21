@@ -4,8 +4,8 @@ import 'package:path/path.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'db.dart';
-import 'add_expenditure.dart';
+import '../utils/db.dart';
+import '../pages/AddExpenditurePage.dart';
 
 
 class addCategoryDialog extends StatefulWidget {

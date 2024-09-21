@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'db.dart';
+import '../utils/db.dart';
 
 class ExpenseBarChart extends StatefulWidget {
   final int MonthIndex; // Parameter to pass

@@ -102,6 +102,7 @@ flutter:
     - assets/images/pie-chart.png
     - assets/images/happiness.png
     - assets/images/statistics.png
+    - assets/images/user.png
   fonts:
      - family: Poppins
        fonts:

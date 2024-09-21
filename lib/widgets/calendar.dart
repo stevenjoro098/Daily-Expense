@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'db.dart';
+import '../utils/db.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});

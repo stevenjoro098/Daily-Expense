@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'db.dart';
+
+import '../utils/db.dart';
+import '../widgets/add_category.dart';
 
 class listCategory extends StatefulWidget {
   const listCategory({super.key});
@@ -65,6 +63,19 @@ class _listCategoryState extends State<listCategory> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Select Category.'),
+        actions: [
+          IconButton(
+              onPressed: (){
+            showDialog(
+              context: context,
+              builder: (BuildContext context){
+                return const addCategoryDialog();
+              },
+            );
+          },
+              icon: Icon(Icons.add)
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -79,12 +90,50 @@ class _listCategoryState extends State<listCategory> {
                      child: Padding(
                        padding: const EdgeInsets.all(8.0),
                        child: ListTile(
-                         leading: Image.asset('assets/images/options.png'),
+                         leading: Image.asset('assets/images/app.png'),
                           title: Text('${myData[index]['category_name']}',
                               style: const TextStyle(
                                  fontWeight: FontWeight.bold
                                 ),
                               ),
+                          trailing:Row(
+                         mainAxisSize: MainAxisSize.min,
+                         children: [
+                           IconButton(
+                             onPressed: (){},
+                             icon: Image.asset('assets/images/edit.png',height: 20, width: 20),
+                           ),
+                           IconButton(
+                             onPressed: (){
+                               showDialog(
+                                   context: context,
+                                   builder: (BuildContext context){
+                                     return AlertDialog(
+                                       title: const Text('Delete'),
+                                       content: Text('Delete ${myData[index]['category_name']} Category??'),
+                                       actions: <Widget>[
+                                         TextButton(
+                                           onPressed: () => Navigator.pop(context, 'Cancel'),
+                                           child: const Text('Cancel'),
+                                         ),
+                                         TextButton(
+                                           onPressed: (){
+                                             //print(myData[index]['id']);
+                                             deleteCategory(myData[index]['id']);
+                                             Navigator.pop(context);
+                                           },
+                                           child: const Text('OK'),
+                                         ),
+                                       ],
+                                     );
+                                   }
+
+                               );
+                             },
+                             icon: Image.asset('assets/images/delete.png',height: 20, width: 20),
+                           ),
+                         ],
+                       ),
                           onTap: (){
                             Navigator.pop(context,'${myData[index]['category_name']}'); // return category name to parent widget.
                            },

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'db.dart';
+import '../utils/db.dart';
 
 class AddIncomeDialog extends StatefulWidget {
   const AddIncomeDialog({super.key});

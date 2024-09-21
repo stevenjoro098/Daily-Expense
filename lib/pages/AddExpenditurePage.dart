@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
-import 'add_category.dart';
-import 'list_categorys.dart';
-import 'db.dart';
-import 'categories_page.dart';
+import '../widgets/add_category.dart';
+import 'CategoriesPage.dart';
+import '../utils/db.dart';
+import 'CategoriesPage.dart';
 
 class addExpensesPage extends StatefulWidget {
   const addExpensesPage({super.key});
@@ -80,7 +80,7 @@ class _addExpensesPageState extends State<addExpensesPage> {
         ),
         centerTitle: true,
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -89,14 +89,6 @@ class _addExpensesPageState extends State<addExpensesPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ElevatedButton.icon(
-                      onPressed: (){},
-                      label: const Text('Payment Method'),
-                    icon: const Icon(Icons.payment),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(Colors.greenAccent)
-                    ),
-                  ),
                   ElevatedButton.icon(
                       onPressed: (){
                        // push the alert widget and receive data from it.
@@ -119,34 +111,44 @@ class _addExpensesPageState extends State<addExpensesPage> {
                 ],
               ),
               const SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.all(6.0),
-                child: Center(
-                    child: TextField(
-                      controller: expensesController,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.money_outlined),
-                        hintText: 'Enter Amount',
-                        labelText: 'Expense Amount',
-                        filled: true,
-                        border: OutlineInputBorder()
+              Form(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: Center(
+                            child: TextField(
+                              controller: expensesController,
+                              decoration: const InputDecoration(
+                                  prefixIcon: Icon(Icons.money_outlined),
+                                  hintText: 'Enter Amount',
+                                  labelText: 'Expense Amount',
+                                  filled: true,
+                                  border: OutlineInputBorder()
+                              ),
+                            )
+                        ),
                       ),
-                    )
-                ),
+
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Center(
+                          child: TextField(
+                            controller: expenseDescription,
+                            decoration: const InputDecoration(
+                                prefixIcon: Icon(Icons.comment),
+                                hintText: 'Description',
+                                filled: true
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    ],
+                  )
+
               ),
-               Padding(
-                 padding: const EdgeInsets.all(8.0),
-                 child: Center(
-                   child: TextField(
-                     controller: expenseDescription,
-                     decoration: const InputDecoration(
-                       prefixIcon: Icon(Icons.comment),
-                       hintText: 'Description',
-                       filled: true
-                     ),
-                   ),
-                 ),
-               ),
+
                const SizedBox(height: 20,),
                Row(
                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -197,39 +199,7 @@ class _addExpensesPageState extends State<addExpensesPage> {
                       ),
                  ],
                ),
-              const SizedBox(height: 15,),
 
-              ElevatedButton(
-                  onPressed:(){
-                    showDialog(
-                        context: context,
-                        builder: (BuildContext context){
-                          return const addCategoryDialog();
-                                                 },
-                    );
-                  },
-                  child:const Text('Add Category',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold
-                      ),
-                  ),
-              ),
-              const SizedBox(height: 10,),
-              ElevatedButton(
-                  onPressed: (){
-                    Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const categoryPage()),);
-
-                  },
-                style: const ButtonStyle(
-              //backgroundColor: MaterialStateProperty.all<Color>(Colors.deepOrangeAccent)
-                 ),
-                  child: const Text('Manage Category List',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold
-                    ),
-                  ),
-              )
             ],
           ),
         ),

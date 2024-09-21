@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'AddIncomeDialog.dart';
-import 'db.dart';
+import '../widgets/AddIncomeDialog.dart';
+import '../utils/db.dart';
 
 class IncomePage extends StatefulWidget {
   const IncomePage({super.key});
