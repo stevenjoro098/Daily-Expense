@@ -103,6 +103,7 @@ flutter:
     - assets/images/happiness.png
     - assets/images/statistics.png
     - assets/images/user.png
+    - assets/images/income.png
   fonts:
      - family: Poppins
        fonts:

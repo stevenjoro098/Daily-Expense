@@ -209,7 +209,7 @@ Future<double> totalMonthlyExpenditure(int month, int year) async {
   double totalAmount = (result.first['total_amount'] ?? 0).toDouble();
 
   print('DB Monthly total: $totalAmount');
-  AllExpenseList();
+  //AllExpenseList();
   return totalAmount;
 }
 

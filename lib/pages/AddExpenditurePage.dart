@@ -24,25 +24,34 @@ class _addExpensesPageState extends State<addExpensesPage> {
   Future<void> insertExpense(String expense, String description, String expense_date, String category) async {
     final db = await initDatabase();
     if(_formKey.currentState!.validate()){
-      print(_formKey.currentWidget);
-      // print('Expense insert Method Called');
-      // await db.insert(
-      //     'expense',
-      //     {'expense_amount': expense,
-      //       'description': description,
-      //       'expense_date': expense_date,
-      //       'category': category
-      //     },
-      //     conflictAlgorithm: ConflictAlgorithm.replace
-      // );
-      // final snackBar = const SnackBar(
-      //   content: Text('Expense Added Successfully'),
-      // );
-      //
-      // // Find the ScaffoldMessenger in the widget tree
-      // // and use it to show a SnackBar.
-      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      if(expenseCategory == ""){
+        const snackBar = SnackBar(
+          content: Text('Please Select a Category'),
+        );
+        // Find the ScaffoldMessenger in the widget tree
+        // and use it to show a SnackBar.
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } else {
+        print('Expense insert Method Called');
+        await db.insert(
+            'expense',
+            {'expense_amount': expense,
+              'description': description,
+              'expense_date': expense_date,
+              'category': category
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace
+        );
+        clear_textfields();
+        expenseCategory = "";
+        const snackBar = SnackBar(
+          content: Text('Expense Added Successfully'),
+        );
 
+        // Find the ScaffoldMessenger in the widget tree
+        // and use it to show a SnackBar.
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
     }
 
   }

@@ -7,13 +7,15 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/ExpenseChartBar.dart';
+import '../widgets/HomeAppBar.dart';
 import '../utils/db.dart';
 import '../widgets/calendar.dart';
 import 'AddExpenditurePage.dart';
 import '../utils/_helperFn.dart';
 import 'IncomePage.dart';
 import 'Profile.dart';
-import 'package:daily_expenses/widgets/HomeAppBar.dart';
+import '../widgets/HomeDrawer.dart';
+import '../widgets/HomeExpenseList.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -158,45 +160,7 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      drawer: Drawer(
-          child: ListView(
-            children: [
-                DrawerHeader(
-                    decoration: const BoxDecoration(
-                    color: Colors.blueAccent,
-                    ),
-                  child: Image.asset('assets/images/pie-chart.png', width: 200,)
-                ),
-              ListTile(
-                title: const Text('Profile'),
-                leading: Icon(Icons.person),
-                onTap: () {
-                  Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const Profile()),);
-
-                },
-              ),
-              ListTile(
-                title: const Text('Statistics'),
-                leading: Icon(Icons.bar_chart),
-                onTap: () {
-                },
-              ),
-              ListTile(
-                title: const Text('Settings'),
-                leading: Icon(Icons.settings),
-                onTap: () {
-                },
-              ),
-              ListTile(
-                title: const Text('Sign Out'),
-                leading: Icon(Icons.exit_to_app),
-                onTap: () {
-                },
-              ),
-            ],
-          )// Populate the Drawer in the last step.
-      ),
+      drawer: CustomDrawer(),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -344,7 +308,7 @@ class _HomePageState extends State<HomePage> {
                           focusColor: Colors.transparent,
                           icon: const Icon(Icons.arrow_drop_down, color: Colors.blueAccent, size: 24), // Custom arrow icon
                           dropdownColor: Colors.blue[50], // Dropdown background color
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.blueAccent, // Text color in the dropdown
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
@@ -421,6 +385,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               )
+
                   :ListView.builder(
                   itemCount: myData.length,
                   shrinkWrap: true,
