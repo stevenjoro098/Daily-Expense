@@ -126,6 +126,20 @@ Future<double> totalMonthIncome(String month, String year) async {
   return totalIncomeAmount;
 }
   //****************************************************************************
+    Future<List<Map<String, dynamic>>> listMonthlyAllIncome(String month, String year) async {
+      final db = await initDatabase();
+      final List<Map<String, dynamic>> result = await db.rawQuery('''
+        SELECT *
+        FROM income
+        WHERE strftime('%m', income_date) = ?
+              AND strftime('%Y', income_date) = ?
+    ''',
+          [month,year]);
+      print(result);
+      return result;
+    }
+//****************************************************************************
+
    Future<void> insertCategory(String category) async {
      final db = await initDatabase();
      print('insert method called');
@@ -157,21 +171,16 @@ Future<double> totalMonthIncome(String month, String year) async {
   }
   // ***************************** List All Expenses ***************************
 
-  Future<List<Map<String, dynamic>>> AllExpenseList() async {
+  Future<List<Map<String, dynamic>>> AllExpenseList(String month, String year) async {
       final db = await initDatabase();
-      // Ensure the month is two digits
-      int formattedMonth = 9;
-      int year = 2024;
-      final List<Map<String, dynamic>> result = await db.rawQuery(
-          '''
-        SELECT *
-        FROM expense
-        WHERE expense_date LIKE '${year}-${formattedMonth}%'
-        ''',
-
-      );
-
-     // print(result);  // Debug: print the result
+      var formattedMonth = month.replaceFirst(RegExp(r'^0+'), '');
+      final List<Map<String, dynamic>> result = await db.rawQuery('''
+          SELECT *
+          FROM expense
+          WHERE expense_date LIKE '${year}-${formattedMonth}%'
+              
+              ''');
+      print(formattedMonth);
       return result;
     }
 
@@ -190,7 +199,6 @@ Future<double> totalMonthIncome(String month, String year) async {
     );
     double totalAmount = (result.first['total_amount'] ?? 0.0) as double;
     print('Todays total: $totalAmount');
-
     return totalAmount;
   }
   // ********************* Total Month Expense Amount *****************************
@@ -260,3 +268,13 @@ Future<void> deleteExpense(int id) async {
   );
   print('Expense Deleted');
 }
+//*************************** DELETE INCOME ************************************
+// Future<void> deleteIncome(String month) async {
+//   final db = await initDatabase();
+//   await db.rawQuery(
+//       '''
+//       //DELETE FROM income
+//       '''
+//   );
+//   print('Income Deleted');
+// }

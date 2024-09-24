@@ -73,7 +73,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Income: ${MonthlyincomeExpeData[index]['total_income']}',
+                                    'Income:${MonthlyincomeExpeData[index]['total_income']}',
                                     style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                       fontSize: 20,
