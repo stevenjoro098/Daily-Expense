@@ -40,6 +40,13 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            title: const Text('Budget'),
+            leading: const Icon(Icons.money_sharp, color: Colors.indigo),
+            onTap: () {
+              // Handle Settings tap
+            },
+          ),
+          ListTile(
             title: const Text('Settings'),
             leading: const Icon(Icons.settings, color: Colors.green),
             onTap: () {

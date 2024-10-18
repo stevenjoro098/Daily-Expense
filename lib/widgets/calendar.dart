@@ -22,7 +22,7 @@ class _CalendarPageState extends State<CalendarPage> {
     setState(() {
       dayExpenses = data; // constantly update list when data is fetched.
     });
-    print(dayExpenses);
+    //print(dayExpenses);
     return data;
   }
 
@@ -31,6 +31,11 @@ class _CalendarPageState extends State<CalendarPage> {
       String dateOnly = "${dateTime.year}-${dateTime.month}-${dateTime.day}";
       print("Extracted Date: $dateOnly");
       return dateOnly;
+  }
+  @override
+  void initState(){
+    super.initState();
+    getDateExpenses(_focusedDay);
   }
 
   @override
@@ -80,7 +85,7 @@ class _CalendarPageState extends State<CalendarPage> {
           Expanded(
             child: dayExpenses.isEmpty ?
                 Center(
-                  child: Image.asset('assets/images/rascal-nothing-to-see-here.gif', height: 300, width: 300,),
+                  child: Image.asset('assets/images/rascal-nothing-to-see-here.gif', height: 250, width: 250,),
 
                 )
             :ListView.builder(
@@ -96,7 +101,8 @@ class _CalendarPageState extends State<CalendarPage> {
                     subtitle: Text('Ksh. ${dayExpenses[index]['expense_amount']}'),
                     trailing: IconButton(
                       onPressed: (){
-                       deleteExpense(dayExpenses[index]['id']);
+                       deleteExpense(context, dayExpenses[index]['id']);
+                       getDateExpenses(_focusedDay);
                       },
                       icon: const Icon(Icons.clear, color: Colors.indigo,),
                     ),

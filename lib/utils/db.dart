@@ -261,20 +261,46 @@ Future<void> deleteCategory(int id) async {
 
 // **************************** DELETE EXPENSE *********************************
 
-Future<void> deleteExpense(int id) async {
+Future<void> deleteExpense(BuildContext context, int id) async {
   final db = await initDatabase();
   await db.rawQuery(
     'DELETE FROM expense WHERE id =?',[id]
   );
   print('Expense Deleted');
+  final snackBar = SnackBar(
+    content: const Text('Expense Deleted'),
+    action: SnackBarAction(
+      label: 'Ok',
+      onPressed: () {
+        // Some code to undo the change.
+      },
+    ),
+  );
+
+  // Find the ScaffoldMessenger in the widget tree
+  // and use it to show a SnackBar.
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 //*************************** DELETE INCOME ************************************
-// Future<void> deleteIncome(String month) async {
-//   final db = await initDatabase();
-//   await db.rawQuery(
-//       '''
-//       //DELETE FROM income
-//       '''
-//   );
-//   print('Income Deleted');
-// }
+Future<void> deleteIncome(BuildContext context, int id) async {
+  final db = await initDatabase();
+  await db.rawQuery(
+      '''
+      DELETE FROM income WHERE id=?
+      ''',[id]
+  );
+  print('Income Deleted');
+  final snackBar = SnackBar(
+    content: const Text('Income Deleted'),
+    action: SnackBarAction(
+      label: 'Ok',
+      onPressed: () {
+        // Some code to undo the change.
+      },
+    ),
+  );
+
+  // Find the ScaffoldMessenger in the widget tree
+  // and use it to show a SnackBar.
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+}

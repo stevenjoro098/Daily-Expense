@@ -93,7 +93,7 @@ class _ExpenseBarChartState extends State<ExpenseBarChart> {
             ),
             const SizedBox(height: 20,),
             SizedBox(
-              height: 200, // Adjust height as needed
+              height: 220, // Adjust height as needed
               child: charts.BarChart(
                 _seriesList,
                 animate: true,

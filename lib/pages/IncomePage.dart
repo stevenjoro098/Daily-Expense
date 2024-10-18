@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/AddIncomeDialog.dart';
+import '../pages/IncomeMonthlyList.dart';
 import '../utils/db.dart';
 
 class IncomePage extends StatefulWidget {
@@ -37,6 +38,7 @@ class _IncomePageState extends State<IncomePage> {
     };
     return monthMap[monthName] ?? DateTime.now().month; // Default to current month
   }
+
   @override
   void initState(){
     super.initState();
@@ -66,6 +68,13 @@ class _IncomePageState extends State<IncomePage> {
                       trailing: Text("${ incomeData[index]['total_income']}"),
                       title: Text("${_getMonthNumber(incomeData[index]['month'])}"),
                       subtitle: Text("${incomeData[index]['year']}"),
+                      onTap: (){
+                        Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => MonthlyIncomeList(
+                              month: incomeData[index]['month'],
+                              year: incomeData[index]['year'])));
+
+                      },
                     ),
                   );
                 })

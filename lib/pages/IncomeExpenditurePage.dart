@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path/path.dart';
 
 import '../utils/db.dart';
+import '../utils/pdf.dart';
+import 'monthlyStats.dart';
+
 class IncomeExpenditurePage extends StatefulWidget {
   final String month;
   final String year;
@@ -46,18 +50,26 @@ class _IncomeExpenditurePageState extends State<IncomeExpenditurePage> {
           appBar: AppBar(
             actions: [
               IconButton(
-                  onPressed: (){},
+                  onPressed: (){
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => monthlyStats(month: widget.month, year: widget.year,)));
+
+                  },
                   icon: Icon(Icons.bar_chart)
               ),
               IconButton(
-                  onPressed: (){},
+                  onPressed: (){
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => PDFGeneratorWidget()));
+
+                  },
                   icon: Icon(Icons.print)
               )
             ],
             bottom: const TabBar(
               tabs: [
-                Tab(icon: Icon(Icons.arrow_downward_rounded,), text:'Income',),
-                Tab(icon: Icon(Icons.upload_rounded), text:'Expenses'),
+                Tab(icon: FaIcon(FontAwesomeIcons.circleArrowDown, color: Colors.green), text:'Income',),
+                Tab(icon: FaIcon(FontAwesomeIcons.circleArrowUp, color: Colors.red), text:'Expenses'),
                 //Tab(icon: Icon(Icons.directions_bike)),
               ],
             ),
@@ -86,7 +98,7 @@ class _IncomeExpenditurePageState extends State<IncomeExpenditurePage> {
                                 ),
                               ),
                               subtitle: Text("Description: ${ incomeList[index]['income_description']}"),
-                              trailing: Text("${ incomeList[index]['income_date']}"),
+                              //trailing: Text("${ incomeList[index]['income_date']}"),
                             )
                           );
                       })

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../utils/db.dart';
 import 'IncomeExpenditurePage.dart';
@@ -29,13 +30,15 @@ class _StatisticsPageState extends State<StatisticsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Statistics'),
+        title: const Text('...'),
+        elevation: 3,
+        backgroundColor: Colors.white60,
       ),
       body: SingleChildScrollView(
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(7.0),
+                padding: const EdgeInsets.all(6.0),
                 child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: MonthlyincomeExpeData.length,
@@ -57,7 +60,11 @@ class _StatisticsPageState extends State<StatisticsPage> {
                         } else if (snapshot.hasError) {
                           return Card(
                             child: ListTile(
-                              title: Text('${MonthlyincomeExpeData[index]['month']}'),
+                              title: Text('${MonthlyincomeExpeData[index]['month']}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold
+                                ),
+                              ),
                               subtitle: Text('Error: ${snapshot.error}'),
                             ),
                           );
@@ -65,40 +72,51 @@ class _StatisticsPageState extends State<StatisticsPage> {
                           var totalExp = snapshot.data.toString();
                           return Card(
                             elevation: 3,
-                              color: Colors.blueAccent[100],
                             child: ListTile(
-                              title: Text('${MonthlyincomeExpeData[index]['month']}, ${MonthlyincomeExpeData[index]['year']}'),
+                              title: Text('Month: ${MonthlyincomeExpeData[index]['month']}, ${MonthlyincomeExpeData[index]['year']}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  wordSpacing: 4
+                                  ),
+                                ),
                               subtitle: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Income:${MonthlyincomeExpeData[index]['total_income']}',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                      fontFamily: 'Tillium',
-                                      color: Colors.greenAccent
+                                  Divider(),
+                                  ListTile(
+                                    title: Text(
+                                      'Income: ${MonthlyincomeExpeData[index]['total_income']}',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          fontFamily: 'Tillium',
+                                          color: Colors.blueGrey
+                                      ),
                                     ),
+                                    leading: const FaIcon(FontAwesomeIcons.circleArrowDown, color: Colors.green),
                                   ),
-                                  Text('Expenses: $totalExp',
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 20,
-                                        fontFamily: 'Tillium',
-                                      color: Colors.redAccent
+                                  ListTile(
+                                    title: Text('Expenses: $totalExp',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          fontFamily: 'Tillium',
+                                          color: Colors.pink
+                                      ),
                                     ),
+                                    leading: const FaIcon(FontAwesomeIcons.circleArrowUp, color: Colors.red,),
                                   ),
+                                  const SizedBox(height: 5,),
+                                  ElevatedButton(
+                                    onPressed: (){
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => IncomeExpenditurePage(month:MonthlyincomeExpeData[index]['month'],year: MonthlyincomeExpeData[index]['year'],)),
+                                      );
+                                    }, child: const Text('View'),
+                                  )
                                 ],
-                              ),
-                              trailing: IconButton(
-                                onPressed: (){
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => IncomeExpenditurePage(month:MonthlyincomeExpeData[index]['month'],year: MonthlyincomeExpeData[index]['year'],)),
-                                  );
-                                },
-                                icon:const Icon(Icons.keyboard_double_arrow_right, color: Colors.red,),
                               )
                             ),
                           );

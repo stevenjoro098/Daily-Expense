@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sqflite/sqflite.dart';
 import '../widgets/add_category.dart';
 import 'CategoriesPage.dart';
@@ -94,10 +96,11 @@ class _addExpensesPageState extends State<addExpensesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.teal,
-        title: const Text('Expense Form',
+        backgroundColor: Colors.blueAccent,
+        title: const Text('Expense',
           style: TextStyle(
-              fontWeight: FontWeight.bold
+              fontWeight: FontWeight.bold,
+            fontFamily: 'Tillium'
           ),
         ),
         centerTitle: true,
@@ -115,21 +118,37 @@ class _addExpensesPageState extends State<addExpensesPage> {
                       Padding(
                         padding: const EdgeInsets.all(6.0),
                         child: Center(
-                            child: TextFormField(
-                              controller: expensesController,
-                              decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.money_rounded),
-                                  hintText: 'Enter Amount',
-                                  labelText: 'Expense Amount',
-                                  filled: true,
-                                  border: OutlineInputBorder()
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20.0),
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please Enter Amount';
-                                }
-                                return null;
-                              },
+                              child: TextFormField(
+                                controller: expensesController,
+                                decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.money),
+                                    hintText: 'Enter Amount',
+                                    labelText: 'Expense Amount',
+                                    filled: true,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(20), // Circular corners with a 30px radius
+                                      borderSide: BorderSide.none, // Removes the border line
+                                    ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: BorderSide(color: Colors.grey), // Border when the field is not focused
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: BorderSide(color: Colors.blue), // Border when the field is focused
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please Enter Amount';
+                                  }
+                                  return null;
+                                },
+                              ),
                             )
                         ),
                       ),
@@ -148,10 +167,23 @@ class _addExpensesPageState extends State<addExpensesPage> {
                         child: Center(
                           child: TextFormField(
                             controller: expenseDescription,
-                            decoration: const InputDecoration(
-                                prefixIcon: Icon(Icons.comment),
+                            decoration: InputDecoration(
+                                prefixIcon: const Icon(Icons.add_comment_outlined, color: Colors.blueAccent),
                                 hintText: 'Description',
-                                filled: true
+                                labelText: 'Expense Description',
+                                filled: true,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30), // Circular corners with a 30px radius
+                                  borderSide: BorderSide.none, // Removes the border line
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: const BorderSide(color: Colors.grey), // Border when the field is not focused
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: const BorderSide(color: Colors.blue), // Border when the field is focused
+                                ),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -169,6 +201,7 @@ class _addExpensesPageState extends State<addExpensesPage> {
               ),
 
                const SizedBox(height: 20,),
+
                Row(
                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                  children: [

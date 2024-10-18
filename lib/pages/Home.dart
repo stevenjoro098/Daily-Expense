@@ -1,4 +1,5 @@
 
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   String firstName = "";
   String selectedValue = '';
   int selectedMonth = 0;
@@ -35,8 +36,11 @@ class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> myData = [];
   double dailyTotal = 0.0;
   double monthlyTotal = 0.0;
-  DateTime now = DateTime.now();
 
+  late AnimationController _controller;
+
+  DateTime now = DateTime.now();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
   DateTime getTodaysDate() {
     DateTime now = DateTime.now();
     setState(() {
@@ -120,9 +124,10 @@ class _HomePageState extends State<HomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       firstName = prefs.getString('firstName') ?? 'John';
-      currency = prefs.getString('currency') ?? 'Usd';
+      currency = prefs.getString('currency') ?? 'USD';
     });
   }
+
   @override
   void initState(){
     super.initState();
@@ -133,12 +138,34 @@ class _HomePageState extends State<HomePage> {
     getMonthlyTotal(now.month);
     getIncomeTotal(now.month, now.year);
     loadProfileData();
+    // Initialize the AnimationController
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2), // Set duration for 360-degree rotation
+    ); // Repeat indefinitely
+    // Start the rotation animation when the widget is initialized
+    _controller.forward().whenComplete(() => _controller.reset());
   }
+
   @override
+  void dispose() {
+    _controller.dispose(); // Dispose the controller when the widget is removed
+    super.dispose();
+  }
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/images/statistics.png', width: 40,),
+        title: AnimatedBuilder(
+          animation: _controller,
+            builder: (context, child){
+              return Transform.rotate(
+                  angle: _controller.value * 2 * pi,
+                child: child,
+              );
+            },
+            child: Image.asset('assets/images/statistics.png', width: 40,)
+        ),
         centerTitle: true,
         leading: Builder(
           builder: (context) {
@@ -153,289 +180,303 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
               onPressed: (){},
-              icon:Icon(Icons.account_circle_outlined)
+              icon: const Icon(Icons.account_circle_outlined, color: Colors.blueAccent,)
           ),
           IconButton(onPressed: (){},
-              icon:Icon(Icons.notifications)
+              icon: const Icon(Icons.notifications, color: Colors.deepOrange,)
           )
         ],
       ),
       drawer: CustomDrawer(),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-               Row(
-                children: [
-                  Text('Hello, $firstName.',
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        color: Colors.white,
+        backgroundColor: Colors.blue,
+        strokeWidth: 4.0,
+        onRefresh: () async {
+           getIncomeTotal(now.month, now.year);
+           getTodaysDate();
+           getCurrentMonth();
+           fetchExpenseData();
+           getTodayTotal();
+           categorySum(now.month, now.year);
+           getMonthlyTotal(now.month);
+        },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                 Row(
+                  children: [
+                    Text('Hello, $firstName.',
+                      style: const TextStyle(
+                        fontFamily: 'DancingScript',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 30
+                      ),
+                    )
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text("Date: ${now.day}-${now.month}-${now.year}",
                     style: const TextStyle(
-                      fontFamily: 'DancingScript',
                       fontWeight: FontWeight.bold,
-                      fontSize: 30
+                      color: Colors.grey,
+                      ),
                     ),
-                  )
-                ],
-              ),
-              Row(
-                children: [
-                  Text("Date: ${now.day}-${now.month}-${now.year}",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-
-                  ),
-                  ),
-                ],
-              ),
-              //Divider(),
-              Card(
-                color: Colors.blue[100],
-                elevation: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: [
-                      const Text('Balance',
-                        style: TextStyle(
-                            fontFamily: 'Tillium',
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22
+                  ],
+                ),
+                //Divider(),
+                Card(
+                  color: Colors.blue[100],
+                  elevation: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      children: [
+                        const Text('Balance',
+                          style: TextStyle(
+                              fontFamily: 'Tillium',
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22
+                          ),
                         ),
-                      ),
-                      Text('$currency.$monthlyBalance ',
-                        style: const TextStyle(
-                          fontFamily: 'Tillium',
-                          fontSize: 27
-                         ),
-                      ),
-                      const SizedBox(height: 10,),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.expand_circle_down_rounded, color: Colors.green,),
-                              const SizedBox(width: 5,),
-                              Text('$currency. $monthlyIncomeTotal',
+                        Text('$currency.$monthlyBalance ',
+                          style: const TextStyle(
+                            fontFamily: 'Tillium',
+                            fontSize: 27
+                           ),
+                        ),
+                        const SizedBox(height: 10,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.expand_circle_down_rounded, color: Colors.green,),
+                                const SizedBox(width: 5,),
+                                Text('$currency. $monthlyIncomeTotal',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: 'Tillium',
+                                        fontSize: 17
+                                    ),
+                                  ),
+                              ],
+                            ),
+                              //leading: Icon(Icons.arrow_drop_down),
+                            Row(
+                              children: [
+                                const Icon(Icons.upload_rounded, color: Colors.redAccent),
+                                const SizedBox(width: 5,),
+                                Text('$currency. $monthlyTotal',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'Tillium',
                                       fontSize: 17
                                   ),
                                 ),
-                            ],
-                          ),
-                            //leading: Icon(Icons.arrow_drop_down),
-                          Row(
-                            children: [
-                              const Icon(Icons.upload, color: Colors.redAccent),
-                              const SizedBox(width: 5,),
-                              Text('$currency. $monthlyTotal',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'Tillium',
-                                    fontSize: 17
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      )
-
-                    ]
-
+                              ],
+                            ),
+                          ],
+                        )
+        
+                      ]
+        
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 4,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CupertinoSegmentedControl<int>(
-                    padding: const EdgeInsets.all(8),  // Add padding for better appearance
-                    borderColor: Colors.black54,    // Customize the border color
-                    pressedColor: Colors.blue.shade100, // Color when a segment is pressed
-                    selectedColor: Colors.black,  // Color for the selected segment
-                    unselectedColor: Colors.teal[100], // Background color for unselected segments
-                    children: const {
-                      0: Padding(
-                          padding: const EdgeInsets.all(8),
-                        child:Text(
-                            'Expenses',
+                SizedBox(height: 4,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CupertinoSegmentedControl<int>(
+                      padding: const EdgeInsets.all(8),  // Add padding for better appearance
+                      borderColor: Colors.black54,    // Customize the border color
+                      pressedColor: Colors.blue.shade100, // Color when a segment is pressed
+                      selectedColor: Colors.black,  // Color for the selected segment
+                      //unselectedColor: Colors.teal[100], // Background color for unselected segments
+                      children: const {
+                        0: Padding(
+                            padding: const EdgeInsets.all(8),
+                          child:Text(
+                              'Expenses',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.redAccent
+                            ),
+                          ) ,
+                        ),
+                        1: Text(
+                            'Income',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.redAccent
+                            color: Colors.green
                           ),
-                        ) ,
-                      ),
-                      1: Text(
-                          'Income',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green
                         ),
-                      ),
-                    },
-                    onValueChanged: (int value) {
-                      if(value == 0){
-                        setState(() {
-                          Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => const CalendarPage()),);
-                        });
-                      } else {
-                        Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => const IncomePage()),);
-                      }
-        
-                    },
-                    //groupValue: segmentedValue,
-                  ),
-                  SizedBox(
-                    height: 40,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent.withOpacity(0.1), // Background color
-                        borderRadius: BorderRadius.circular(10),   // Rounded corners
-                        border: Border.all(color: Colors.blueAccent, width: 2), // Border styling
-                      ),
-                      child:DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: selectedValue,
-                          focusColor: Colors.transparent,
-                          icon: const Icon(Icons.arrow_drop_down, color: Colors.blueAccent, size: 24), // Custom arrow icon
-                          dropdownColor: Colors.blue[50], // Dropdown background color
-                          style: const TextStyle(
-                            color: Colors.blueAccent, // Text color in the dropdown
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                          onChanged: (newValue){
-                            setState(() {
-                              selectedValue = newValue!;
-                              selectedMonth = _getMonthNumber(selectedValue);
-                            });
-                            //print("Month Code:${ selectedMonth}");
-                            categorySum(selectedMonth, now.year);
-                            getIncomeTotal(selectedMonth, now.year);
-                            getMonthlyTotal(selectedMonth);
-
-                          },
-                          items: <String>['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 5,),
-              Center(
-                  child:ExpenseBarChart(MonthIndex: selectedMonth, year: now.year)
-                  ),
-              const Divider(),
-              Card(
-                elevation: 3,
-                child: ListTile(
-                  leading: const Text("Today's Expenditure:",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                    ),
-                  ),
-                  trailing: Text('$currency. $dailyTotal',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10,),
-              myData.isEmpty ?
-              Card(
-                elevation: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children:[
-                      Image.asset('assets/images/spend.png', width: 120,),
-        
-                      const Text(
-                          'No Spending Today!!',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      // Image.asset(
-                      //   'assets/images/empty_list.gif',
-                      //   width: 250, // Adjust width as needed
-                      //   height: 250, // Adjust height as needed
-                      // ),
-                    ]
-                  ),
-                ),
-              )
-
-                  :ListView.builder(
-                  itemCount: myData.length,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index){
-                    return ListTile(
-                      leading: Image.asset('assets/images/spending.png'),
-                      title: Text('${myData[index]['category']}',
-                        style: const TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      trailing: Text(
-                        '$currency. ${myData[index]['expense_amount']}',
-                        style: const TextStyle(
-                            color: Colors.blueAccent,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16
-                        ),
-                      ),
-                      onTap: (){
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context){
-                              return AlertDialog(
-                                title: Text('${myData[index]['category']}.',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.teal
-                                  ),
-                                ),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    ListTile(
-                                      //leading: Icon(Icons.description),
-                                      title: Text(myData[index]['description']),
-                                      subtitle:Text('${myData[index]['expense_date']}'),
-                                      trailing: Text('Ksh. ${myData[index]['expense_amount']}'),
-                                    )
-                                  ],
-                                ),
-                              );
-                            }
-                        );
                       },
-                    );
-                  }
-              ),
-            ],
+                      onValueChanged: (int value) {
+                        if(value == 0){
+                          setState(() {
+                            Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => const CalendarPage()),);
+                          });
+                        } else {
+                          Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => const IncomePage()),);
+                        }
+
+                      },
+                      //groupValue: segmentedValue,
+                    ),
+                    SizedBox(
+                      height: 40,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.blueAccent.withOpacity(0.1), // Background color
+                          borderRadius: BorderRadius.circular(10),   // Rounded corners
+                          border: Border.all(color: Colors.blueAccent, width: 2), // Border styling
+                        ),
+                        child:DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: selectedValue,
+                            focusColor: Colors.transparent,
+                            icon: const Icon(Icons.arrow_drop_down, color: Colors.blueAccent, size: 24), // Custom arrow icon
+                            dropdownColor: Colors.blue[50], // Dropdown background color
+                            style: const TextStyle(
+                              color: Colors.blueAccent, // Text color in the dropdown
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            onChanged: (newValue){
+                              setState(() {
+                                selectedValue = newValue!;
+                                selectedMonth = _getMonthNumber(selectedValue);
+                              });
+                              //print("Month Code:${ selectedMonth}");
+                              categorySum(selectedMonth, now.year);
+                              getIncomeTotal(selectedMonth, now.year);
+                              getMonthlyTotal(selectedMonth);
+        
+                            },
+                            items: <String>['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 5,),
+                Center(
+                    child:ExpenseBarChart(MonthIndex: selectedMonth, year: now.year)
+                    ),
+                const Divider(),
+                Card(
+                  elevation: 3,
+                  child: ListTile(
+                    leading: const Text("Today's Expenditure:",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                      ),
+                    ),
+                    trailing: Text('$currency. $dailyTotal',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10,),
+                myData.isEmpty ?
+                Card(
+                  elevation: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children:[
+                        Image.asset('assets/images/spend.png', width: 120,),
+
+                        const Text(
+                            'No Spending Today!!',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        // Image.asset(
+                        //   'assets/images/empty_list.gif',
+                        //   width: 250, // Adjust width as needed
+                        //   height: 250, // Adjust height as needed
+                        // ),
+                      ]
+                    ),
+                  ),
+                )
+        
+                    :ListView.builder(
+                    itemCount: myData.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index){
+                      return ListTile(
+                        leading: Image.asset('assets/images/spending.png'),
+                        title: Text('${myData[index]['category']}',
+                          style: const TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        trailing: Text(
+                          '$currency. ${myData[index]['expense_amount']}',
+                          style: const TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16
+                          ),
+                        ),
+                        onTap: (){
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context){
+                                return AlertDialog(
+                                  title: Text('${myData[index]['category']}.',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.teal
+                                    ),
+                                  ),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ListTile(
+                                        //leading: Icon(Icons.description),
+                                        title: Text(myData[index]['description']),
+                                        subtitle:Text('${myData[index]['expense_date']}'),
+                                        trailing: Text('Ksh. ${myData[index]['expense_amount']}'),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }
+                          );
+                        },
+                      );
+                    }
+                ),
+              ],
+            ),
           ),
         ),
       ),

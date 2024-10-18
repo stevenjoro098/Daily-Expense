@@ -99,110 +99,112 @@ class _ProfileState extends State<Profile> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Image.asset('assets/images/user.png', height: 100),
-              ),
-              // Name Field
-              SizedBox(height: 20,),
-              TextFormField(
-                controller: firstnameController,
-                enabled: isEditing,
-                decoration: const InputDecoration(
-                  labelText: "First Name",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Image.asset('assets/images/user.png', height: 100),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your First name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20,),
-              TextFormField(
-                controller: lastnameController,
-                enabled: isEditing,
-                decoration: const InputDecoration(
-                  labelText: "Last Name",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
+                // Name Field
+                SizedBox(height: 20,),
+                TextFormField(
+                  controller: firstnameController,
+                  enabled: isEditing,
+                  decoration: const InputDecoration(
+                    labelText: "First Name",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your First name';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your Last name';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              // Email Field
-              TextFormField(
-                controller: emailController,
-                enabled: isEditing,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.email),
+                SizedBox(height: 20,),
+                TextFormField(
+                  controller: lastnameController,
+                  enabled: isEditing,
+                  decoration: const InputDecoration(
+                    labelText: "Last Name",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your Last name';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              // Phone Number Field
-              TextFormField(
-                controller: phoneController,
-                enabled: isEditing,
-                decoration: const InputDecoration(
-                  labelText: "Phone Number",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
+                SizedBox(height: 20),
+                // Email Field
+                TextFormField(
+                  controller: emailController,
+                  enabled: isEditing,
+                  decoration: InputDecoration(
+                    labelText: "Email",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.email),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your phone number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              // Phone Number Field
-              TextFormField(
-                controller: currencyController,
-                enabled: isEditing,
-                decoration: const InputDecoration(
-                  labelText: "Currency",
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.phone),
+                SizedBox(height: 20),
+                // Phone Number Field
+                TextFormField(
+                  controller: phoneController,
+                  enabled: isEditing,
+                  decoration: const InputDecoration(
+                    labelText: "Phone Number",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.phone),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your phone number';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your Currency of Choice';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              // Save Button (only shown in editing mode)
-              if (isEditing)
-                ElevatedButton(
-                  onPressed: saveChanges,
-                  child: Text("Save Changes"),
+                const SizedBox(height: 20),
+                // Phone Number Field
+                TextFormField(
+                  controller: currencyController,
+                  enabled: isEditing,
+                  decoration: const InputDecoration(
+                    labelText: "Currency",
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.phone),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your Currency of Choice';
+                    }
+                    return null;
+                  },
                 ),
-            ],
+                SizedBox(height: 20),
+                // Save Button (only shown in editing mode)
+                if (isEditing)
+                  ElevatedButton(
+                    onPressed: saveChanges,
+                    child: Text("Save Changes"),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
