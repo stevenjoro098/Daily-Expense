@@ -80,44 +80,45 @@ class _StatisticsPageState extends State<StatisticsPage> {
                                   ),
                                 ),
                               subtitle: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Divider(),
-                                  ListTile(
-                                    title: Text(
+                                  const SizedBox(height: 5,),
+                                  Chip(
+                                    avatar: const FaIcon(FontAwesomeIcons.circleArrowDown,color: Colors.green),
+                                    label: Text(
                                       'Income: ${MonthlyincomeExpeData[index]['total_income']}',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 20,
+                                          fontSize: 15,
                                           fontFamily: 'Tillium',
                                           color: Colors.blueGrey
                                       ),
                                     ),
-                                    leading: const FaIcon(FontAwesomeIcons.circleArrowDown, color: Colors.green),
                                   ),
-                                  ListTile(
-                                    title: Text('Expenses: $totalExp',
+                                  SizedBox(height: 10,),
+                                  Chip(
+                                    avatar: const FaIcon(FontAwesomeIcons.circleArrowUp,color: Colors.red),
+                                    label: Text('Expenses: $totalExp',
                                       style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 20,
+                                          fontSize: 15,
                                           fontFamily: 'Tillium',
                                           color: Colors.pink
                                       ),
                                     ),
-                                    leading: const FaIcon(FontAwesomeIcons.circleArrowUp, color: Colors.red,),
                                   ),
                                   const SizedBox(height: 5,),
-                                  ElevatedButton(
-                                    onPressed: (){
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => IncomeExpenditurePage(month:MonthlyincomeExpeData[index]['month'],year: MonthlyincomeExpeData[index]['year'],)),
-                                      );
-                                    }, child: const Text('View'),
-                                  )
+
                                 ],
-                              )
+                              ),
+                              trailing: ElevatedButton(
+                                onPressed: (){
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => IncomeExpenditurePage(month:MonthlyincomeExpeData[index]['month'],year: MonthlyincomeExpeData[index]['year'],)),
+                                  );
+                                }, child: const Text('View'),
+                              ),
                             ),
                           );
                         }

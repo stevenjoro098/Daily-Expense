@@ -53,32 +53,39 @@ class _IncomePageState extends State<IncomePage> {
         centerTitle: true,
 
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            ListView.builder(
-                itemCount: incomeData.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index){
-                  return Card(
-                    elevation: 3,
-                    child: ListTile(
-                      leading: Image.asset('assets/images/schedule.png', width: 30,),
-                      trailing: Text("${ incomeData[index]['total_income']}"),
-                      title: Text("${_getMonthNumber(incomeData[index]['month'])}"),
-                      subtitle: Text("${incomeData[index]['year']}"),
-                      onTap: (){
-                        Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => MonthlyIncomeList(
-                              month: incomeData[index]['month'],
-                              year: incomeData[index]['year'])));
-
-                      },
-                    ),
-                  );
-                })
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              ListView.builder(
+                  itemCount: incomeData.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index){
+                    return Card(
+                      elevation: 3,
+                      child: ListTile(
+                        leading: Image.asset('assets/images/schedule.png', width: 30,),
+                        trailing: Text("${ incomeData[index]['total_income']}"),
+                        title: Text("${_getMonthNumber(incomeData[index]['month'])}"),
+                        subtitle: Text("Year: ${incomeData[index]['year']}",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey
+                              ),
+                            ),
+                        onTap: (){
+                          Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => MonthlyIncomeList(
+                                month: incomeData[index]['month'],
+                                year: incomeData[index]['year'])));
+        
+                        },
+                      ),
+                    );
+                  })
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(

@@ -24,6 +24,16 @@ class _listCategoryState extends State<listCategory> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Optionally refresh the widget state here
+    setState(() {
+      // Update your widget state here
+      fetchData();
+    });
+  }
+
+  @override
   void initState() {
     super.initState();
     //initDatabase();
@@ -37,15 +47,17 @@ class _listCategoryState extends State<listCategory> {
         title: const Text('Select Category.'),
         actions: [
           IconButton(
-              onPressed: (){
-            showDialog(
-              context: context,
-              builder: (BuildContext context){
-                return const addCategoryDialog();
-              },
-            );
-          },
-              icon: Icon(Icons.add)
+              onPressed: () async {
+                final result = showDialog(
+                  context: context,
+                  builder: (BuildContext context){
+                    return addCategoryDialog();
+                  },
+                );
+                result.then((value) => fetchData()); // update the category list page.
+
+            },
+              icon: const Icon(Icons.add)
           )
         ],
       ),
@@ -89,10 +101,13 @@ class _listCategoryState extends State<listCategory> {
                                            child: const Text('Cancel'),
                                          ),
                                          TextButton(
-                                           onPressed: (){
+                                           onPressed: () async {
                                              //print(myData[index]['id']);
                                              deleteCategory(myData[index]['id']);
                                              Navigator.pop(context);
+                                             setState(() {
+                                               fetchData();
+                                             });
                                            },
                                            child: const Text('OK'),
                                          ),

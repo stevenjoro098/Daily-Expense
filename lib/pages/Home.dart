@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/ExpenseChartBar.dart';
@@ -147,6 +148,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _controller.forward().whenComplete(() => _controller.reset());
   }
 
+
   @override
   void dispose() {
     _controller.dispose(); // Dispose the controller when the widget is removed
@@ -178,10 +180,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           },
         ),
         actions: [
-          IconButton(
-              onPressed: (){},
-              icon: const Icon(Icons.account_circle_outlined, color: Colors.blueAccent,)
-          ),
+
           IconButton(onPressed: (){},
               icon: const Icon(Icons.notifications, color: Colors.deepOrange,)
           )
@@ -257,7 +256,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.expand_circle_down_rounded, color: Colors.green,),
+                                const FaIcon(FontAwesomeIcons.circleArrowDown, color: Colors.green),
                                 const SizedBox(width: 5,),
                                 Text('$currency. $monthlyIncomeTotal',
                                     style: const TextStyle(
@@ -271,7 +270,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               //leading: Icon(Icons.arrow_drop_down),
                             Row(
                               children: [
-                                const Icon(Icons.upload_rounded, color: Colors.redAccent),
+                                const FaIcon(FontAwesomeIcons.circleArrowUp, color: Colors.red),
                                 const SizedBox(width: 5,),
                                 Text('$currency. $monthlyTotal',
                                   style: const TextStyle(

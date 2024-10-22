@@ -35,47 +35,59 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void initState(){
     super.initState();
-    getDateExpenses(_focusedDay);
+    getDateExpenses("${now.year}-${now.month}-${now.day}"); // Fetch today's expenses data
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendar'),
+        title: const Text('Calendar...'),
       ),
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TableCalendar(
-              firstDay: DateTime.utc(2023, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _focusedDay,
-              calendarFormat: _calendarFormat,
-              selectedDayPredicate: (day){
-                return isSameDay(_selectedDay, day);
-              },
-              onDaySelected: (selectedDay, focusedDay){
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-               // print(selectedDay);
-               String date = extractDate("$selectedDay");
+            child: Card(
+              elevation: 3,
+              color: Colors.blueGrey[200],
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TableCalendar(
+                  calendarStyle: const CalendarStyle(
+                    markerDecoration: BoxDecoration(
+                      color: Colors.deepOrange
+                    )
+                  ),
+                  firstDay: DateTime.utc(2023, 1, 1),
+                  lastDay: DateTime.utc(2030, 12, 31),
+                  focusedDay: _focusedDay,
+                  calendarFormat: _calendarFormat,
+                  selectedDayPredicate: (day){
+                    return isSameDay(_selectedDay, day);
+                  },
+                  onDaySelected: (selectedDay, focusedDay){
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                   // print(selectedDay);
+                   String date = extractDate("$selectedDay");
 
-               getDateExpenses(date);
+                   getDateExpenses(date);
 
-              },
-              onFormatChanged: (format){
-                setState(() {
-                  _calendarFormat = format;
-                });
-            },
-              onPageChanged: (focusedDay){
+                  },
+                  onFormatChanged: (format){
+                    setState(() {
+                      _calendarFormat = format;
+                    });
+                },
+                  onPageChanged: (focusedDay){
 
-              },
+                  },
+                ),
+              ),
             ),
           ),
           const Divider(),
@@ -101,8 +113,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     subtitle: Text('Ksh. ${dayExpenses[index]['expense_amount']}'),
                     trailing: IconButton(
                       onPressed: (){
-                       deleteExpense(context, dayExpenses[index]['id']);
-                       getDateExpenses(_focusedDay);
+                       deleteExpense(context, dayExpenses[index]['id']).then((value) => getDateExpenses(_focusedDay));
                       },
                       icon: const Icon(Icons.clear, color: Colors.indigo,),
                     ),

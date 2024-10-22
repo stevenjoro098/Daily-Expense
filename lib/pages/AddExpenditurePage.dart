@@ -96,27 +96,39 @@ class _addExpensesPageState extends State<addExpensesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 3,
         backgroundColor: Colors.blueAccent,
-        title: const Text('Expense',
+        title: const Text('Expenses',
           style: TextStyle(
               fontWeight: FontWeight.bold,
             fontFamily: 'Tillium'
           ),
         ),
-        centerTitle: true,
+        //centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              const SizedBox(height: 15),
+              const SizedBox(height: 10),
               Form(
                 key: _formKey,
                   child: Column(
                     children: [
+                      Card(
+                        elevation: 3,
+                        child: ListTile(
+                          leading: Image.asset('assets/images/app.png', width: 40,),
+                          title: Text('Select Category: $expenseCategory'),
+                          onTap: (){
+                            _navigateAndDisplaySelection(context);
+                          },
+
+                        ),
+                      ),
                       Padding(
-                        padding: const EdgeInsets.all(6.0),
+                        padding: const EdgeInsets.all(8.0),
                         child: Center(
                             child: Container(
                               decoration: BoxDecoration(
@@ -152,36 +164,26 @@ class _addExpensesPageState extends State<addExpensesPage> {
                             )
                         ),
                       ),
-                      Card(
-                        child: ListTile(
-                          leading: Image.asset('assets/images/app.png', width: 40,),
-                          title: Text('Select Category: $expenseCategory'),
-                          onTap: (){
-                            _navigateAndDisplaySelection(context);
-                          },
-
-                        ),
-                      ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Center(
                           child: TextFormField(
                             controller: expenseDescription,
                             decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.add_comment_outlined, color: Colors.blueAccent),
+                                prefixIcon: const Icon(Icons.comment),
                                 hintText: 'Description',
-                                labelText: 'Expense Description',
+                                labelText: 'Description',
                                 filled: true,
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30), // Circular corners with a 30px radius
+                                  borderRadius: BorderRadius.circular(20), // Circular corners with a 30px radius
                                   borderSide: BorderSide.none, // Removes the border line
                                 ),
                                 enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(20),
                                   borderSide: const BorderSide(color: Colors.grey), // Border when the field is not focused
                                 ),
                                 focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(20),
                                   borderSide: const BorderSide(color: Colors.blue), // Border when the field is focused
                                 ),
                             ),
@@ -200,7 +202,7 @@ class _addExpensesPageState extends State<addExpensesPage> {
 
               ),
 
-               const SizedBox(height: 20,),
+               const SizedBox(height: 25,),
 
                Row(
                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
